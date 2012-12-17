@@ -1,0 +1,454 @@
+.clear { clear: both; margin: 0px; padding: 0px; }
+
+body { font-family: Arial,Tahoma,Verdand,'Myriad Pro','Droid Sans'; font-size: 14px; }
+
+.header {
+	height: 80px; 
+}
+
+.wait {
+	background: red;
+}
+
+.menu {
+	border: 1px solid silver;
+	//margin: 5px;
+	padding: 2px 5px;
+}
+
+.show_node {
+	//border: 1px solid red;
+	margin: 5px;
+}
+
+.title {
+	border: 1px solid silver;
+	font-size: 18pt;
+	width: 100%;
+	text-align: center;
+}
+
+#action {
+	margin: 5px 0 0 0;
+	_border: 1px solid silver;
+	_font-size: 18pt;
+	width: 100%;
+	_text-align: center;
+	_display: none;
+}
+
+button, select, input {
+	border: 1px solid silver;
+}
+
+.button_100 {
+	width: 100px;
+}
+
+input.mini, select.mini {
+	//font-size: 12px;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    border: none;
+    vertical-align: center;
+    background-color: #f0f0f0;
+}
+
+.fiber_button {
+	width: 70px;
+}
+
+.warning {
+	text-align: center;
+	font-size: 18px;
+	color: red;
+}
+
+.show_ports_table {
+	_border: 1px solid silver;
+	//width: 700px;
+}
+
+.bg_silver {
+	background-color: silver;
+}
+
+.port_s {
+	border-top: 1px solid silver;
+	border-left: 1px solid silver;
+	float: left;
+	width: 40px;
+	height: 18px;
+	vertical-align: center;
+	text-align: center;
+}
+
+.fiber_s {
+	border-top: 1px solid silver;
+	border-left: 1px solid silver;
+	float: left;
+	width: 30px;
+	height: 18px;
+	vertical-align: center;
+	text-align: center;
+}
+
+.cable_s {
+	border-top: 1px solid silver;
+	border-left: 1px solid silver;
+	float: left;
+	width: 300px;
+	height: 18px;
+	vertical-align: center;
+	text-align: center;
+}
+
+.desc_s_t {
+	border-top: 1px solid silver;
+	border-left: 1px solid silver;
+	float: left;
+	width: 399px;
+	height: 18px;
+	vertical-align: center;
+	text-align: center;
+}
+
+.desc_s_b_t {
+	border-top: 1px solid silver;
+	border-left: 1px solid silver;
+	border-right: 1px solid silver;
+	float: left;
+	width: 98px;
+	height: 18px;
+}
+
+.desc_s {
+	border: 1px solid silver;
+	border-bottom: 0px;
+	border-right: 0px;
+	float: left;
+	//width: 227px;
+	width: 400px;
+	height: 19px;
+}
+
+.desc_s_b {
+	border: 1px solid silver;
+	border-bottom: 0px;
+	border-right: 0px;
+	float: left;
+	width: 30px;
+	height: 19px;
+}
+
+.desc_s_d {
+	border: 1px solid silver;
+	border-bottom: 0px;
+	float: left;
+	width: 70px;
+	height: 19px;
+}
+
+.last {
+	border-top: 1px solid silver;
+}
+
+.last_free {
+	padding: 0 0 10px 0;
+}
+
+.show_cable {
+	//border: 1px solid red;	
+}
+
+.left_node {
+	float: left;
+	width: 350px;
+	height: 19px;
+	border-bottom: 1px solid silver;
+}
+
+.left_node_desc {
+	float: left;
+	width: 300px;
+	height: 19px;
+	border-left: 1px solid silver;
+	border-bottom: 1px solid silver;
+}
+
+.addr_input {
+	width: 200px;
+}
+
+.addr_input_desc .pq_desc .cable_desc {
+	width: 200px;
+}
+
+.left_pq {
+	float: left;
+	width: 400px;
+	height: 19px;
+	border-bottom: 1px solid silver;
+}
+
+/* начал делать общее универсальное */
+.left {
+	float: left;
+}
+
+.tdiv, .tdiv_r, .tdiv_first, .tdiv_first_r {
+	float: left;
+	border-left: 1px solid silver;
+	border-bottom: 1px solid silver;
+	padding: 0 0 0 2px;
+}
+
+.tdiv_first, .tdiv_first_r {
+	border-top: 1px solid silver;
+}
+
+.tdiv_first_r, .tdiv_r {
+	border-right: 1px solid silver;
+}
+
+.pq_type_num, .cable_type_num {
+	width: 30px;
+	text-align: center;
+}
+
+.pq_type_type {
+	width: 60px;
+	text-align: center;
+	/*height: 19px;
+	(-bracket-:hack;
+        height: 21px;
+    );*/
+}
+
+.pq_type_name, .cable_type_name {
+	width: 200px;
+	text-align: center;
+}
+.pq_type_name_inp, .cable_type_name_inp {
+	width: 120px;
+}
+
+.pq_type_ports, .cable_type_fib {
+	width: 60px;
+	text-align: center;
+}
+.pq_type_ports_inp, .num, .cable_type_fib_inp {
+	width: 30px;
+}
+
+.pq_type_units {
+	width: 60px;
+	text-align: center;
+}
+.pq_type_units_inp {
+	width: 20px;
+}
+
+.cable_type_desc, .cable_type_desc_inp{
+	width: 200px;	
+}
+.cable_type_desc {
+	text-align: center;	
+}
+
+.pq_type_button {
+
+}
+
+.left_pq_desc {
+	float: left;
+	width: 300px;
+	height: 19px;
+	border-left: 1px solid silver;
+	border-bottom: 1px solid silver;
+}
+
+.left_cable {
+	float: left;
+	min-width: 800px;
+	width: 100%;
+	//border: 1px solid red;
+	margin: 10px 0 10px 0;
+	// s_cable
+}
+
+.s_cable {
+	float: left;
+	width: 504px;
+	border-bottom: 1px solid silver;
+	margin: 0 0 10px 0;
+	padding: 0 0 1px 0;
+	// s_cable
+}
+
+// возможно не используется
+.s_cable_all {
+	float: left;
+	//width: 700px;
+	//border-bottom: 2px solid silver;
+	//margin: 0 0 10px 0;
+	padding: 0 0 4px 0;
+	// s_cable
+}
+
+.s_cable_button {
+	float: left;
+	width: 270px;
+	text-align: right;
+	border-bottom: 1px solid silver;
+}
+
+.s_pq {
+	float: left; width: 280px;
+	text-align: right;
+	border-bottom: 2px solid silver;
+	margin: 0 0 10px 0;
+	padding: 0 0 4px 0;
+	_border: 1px solid green;
+	// s_cable
+}
+
+.left_fiber {
+	float: left; width: 700px;
+}
+
+/*.left_fib_conn {
+	float: left;
+	min-width: 800px;
+	//border: 1px solid red;
+	_padding: 0 0 0 20px;
+}*/
+
+.ports {
+	float: left;
+	width: 50px;
+	text-align: center;
+	border: 1px solid silver;
+}
+
+.ports_title {
+	float: left;
+	width: 48px;
+	text-align: center;
+	border: 1px solid silver;
+}
+
+.fiber {
+	float: left;
+	width: 50px;
+	height: 18px;
+	text-align: center;
+	border: 1px solid silver;
+}
+
+.fiber_title {
+	float: left;
+	width: 50px;
+	text-align: center;
+	border: 1px solid silver;
+}
+
+.fiber_title2 {
+	width: 48px;
+}
+
+.free_30 {
+	float: left;
+	width: 30px;
+}
+
+.pq_id_title {
+	float: left;
+	width: 88px;
+	text-align: center;
+	border: 1px solid silver;
+}
+
+.pq_id_sel {
+	width: 90px;
+	text-align: center;
+	border: 1px solid silver;
+}
+
+.cable {
+	width: 250px;
+}
+
+.cable_title {
+	float: left;
+	width: 248px;
+	text-align: center;
+	border: 1px solid silver;
+}
+
+.fiber_sel {
+	//float: left;
+	width: 50px;
+	text-align: center;
+	border: 1px solid silver;
+}
+
+.address {
+	width: 200px;
+}
+
+.address_pq {
+	width: 300px;
+}
+
+/* показывает список соединенных волокон после поиска*/
+.f_fiber {
+	_border: 1px solid silver;
+	display:none;
+	padding: 10px 0;
+	text-align: center;
+}
+
+/*стиль для вывода цепочки подключенных волокон*/
+.show_find_pq {
+	float: left;
+	border: 1px solid silver;
+	text-align: center;
+}
+
+.show_find_pq_title {
+	background: silver;
+}
+
+.show_find_pq_legend {
+	float: left;
+	border-right: 1px solid silver;
+	width: 40%;
+}
+
+.show_find_pq_lfib {
+	float: left;
+	border-right: 1px solid silver;
+	width: 29%;
+}
+
+.show_find_pq_rfib {
+	float: left;
+	_border-left: 1px solid silver;
+	width: 29%;
+}
+
+.border_top {
+	border-top: 1px solid silver;
+}
+
+.show_find_pq_fib {
+	_float: left;
+}
+
+.show_find_pq_arrow {
+	float: left;
+	margin: 17px 5px;
+}

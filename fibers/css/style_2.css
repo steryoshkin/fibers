@@ -1,0 +1,108 @@
+/*button.mini, .button.mini, .tool-button.mini {
+	width: 20px;
+	height: 20px;
+}*/
+
+.clear { clear: both; margin: 0px; padding: 0px; }
+
+input.m0, button.m0, input.m0, .m0 {
+	margin: 0;
+}
+
+input.mini_m5, button.mini_m5, input.mini_m5, .m5 {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.b_m {
+	//float: left;
+	display: inline-block;
+}
+
+.b_m_a {
+	color: black;
+	background: silver;
+	padding: 0 2px;
+	margin: 10px 1px;
+}
+
+.b_m_a:hover {
+	color: silver;
+	background: black;
+}
+
+.span2_5 {
+	width: 150px;
+}
+
+.span1_5 {
+	width: 110px;
+}
+
+.f_fiber, .isoc a:active, .isoc a:link, .isoc a:visited, .isoc a:hover {
+	font-family: 'isocpeur', Tahoma, Arial, sans-serif;
+  	src: url('../fonts/isocpeur.ttf') format('truetype');
+}
+
+a:active.isoc, a:link.isoc, a:visited.isoc {
+	font-family: 'isocpeur', Tahoma, Arial, sans-serif;
+  	src: url('../fonts/isocpeur.ttf') format('truetype');
+  	color: black;
+  	background: silver;
+}
+a:hover.isoc {
+  	background-color: #A0A0A0;
+}
+/*стиль для вывода цепочки подключенных волокон*/
+.show_find_pq {
+	float: left;
+	border: 2px solid silver;
+	text-align: center;
+	margin-bottom: 5px;
+}
+
+.show_find_pq_title {
+	background: silver;
+	min-width: 130px;
+}
+
+.show_find_pq_legend {
+	float: left;
+	border-right: 1px solid silver;
+	width: 40%;
+}
+
+.show_find_pq_lfib {
+	float: left;
+	border-right: 1px solid silver;
+	width: 29%;
+}
+
+.show_find_pq_rfib {
+	float: left;
+	_border-left: 1px solid silver;
+	width: 29%;
+}
+
+.border_top {
+	border-top: 1px solid silver;
+}
+
+.show_find_pq_fib {
+	_float: left;
+}
+
+.show_find_pq_arrow {
+	float: left;
+	margin: 17px 5px;
+}
+
+/********************************/
+
+.b_r {
+	border: 1px solid red;
+}
+
+.left {
+	float: left;
+}
