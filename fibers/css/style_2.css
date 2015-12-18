@@ -1,0 +1,253 @@
+/*button.mini, .button.mini, .tool-button.mini {
+	width: 20px;
+	height: 20px;
+}*/
+
+.clear { clear: both; margin: 0px; padding: 0px; }
+
+input.m0, button.m0, input.m0, .m0 {
+	margin: 0;
+}
+
+input.mini_m5, button.mini_m5, input.mini_m5, .m5 {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.b_m {
+	//float: left;
+	display: inline-block;
+}
+
+.b_m_a {
+	color: black;
+	background: silver;
+	padding: 0 2px;
+	margin: 10px 1px;
+}
+
+.b_m_a:hover {
+	color: silver;
+	background: black;
+}
+
+.span2_5 {
+	width: 150px;
+}
+
+.span1_5 {
+	width: 110px;
+}
+
+.f_fiber, .isoc a:active, .isoc a:link, .isoc a:visited, .isoc a:hover {
+	font-family: 'isocpeur', Tahoma, Arial, sans-serif;
+  	src: url('../fonts/isocpeur.ttf') format('truetype');
+}
+
+.span_text {
+	color: black;
+}
+
+a:active.isoc, a:link.isoc, a:visited.isoc {
+	font-family: 'isocpeur', Tahoma, Arial, sans-serif;
+  	src: url('../fonts/isocpeur.ttf') format('truetype');
+  	color: black;
+  	background: silver;
+}
+a:hover.isoc {
+  	background-color: #A0A0A0;
+}
+/*стиль для вывода цепочки подключенных волокон*/
+.show_find_pq {
+	float: left;
+	border: 2px solid silver;
+	text-align: center;
+	margin-bottom: 5px;
+}
+
+.show_find_pq_title {
+	background: silver;
+	min-width: 140px;
+}
+
+.show_find_pq_legend {
+	float: left;
+	border-right: 1px solid silver;
+	width: 40%;
+}
+
+.show_find_pq_lfib {
+	float: left;
+	border-right: 1px solid silver;
+	width: 30%;
+}
+
+.show_find_pq_mod_color {
+	float: left;
+	width: 50%;
+	//border-right: 1px solid silver;
+	text-align: center;
+}
+
+.show_find_pq_fib_color {
+	float: left;
+	width: 50%;
+	text-align: center;
+}
+
+.show_find_pq_rfib {
+	float: left;
+	_border-left: 1px solid silver;
+	width: 30%;
+}
+
+.w30 {
+	width: 30%;
+}
+
+.border_top {
+	border-top: 1px solid silver;
+}
+
+.show_find_pq_fib {
+	_float: left;
+	//width: 100%;
+}
+
+.show_find_pq_arrow {
+	float: left;
+	margin: 17px 5px;
+}
+
+/********************************/
+
+.b_r {
+	border: 1px solid red;
+}
+
+.left {
+	float: left;
+}
+
+/*.color_block{
+	//width: 270px;
+	padding: 24px 0 0;
+	color: #8c8c8c;
+	font-size: 11px;
+}*/
+/*.color_block .delivery_list {
+	//padding: 3px 6px 0 6px;
+	padding: 0;
+	height: 22px;
+	cursor: pointer;
+	border-radius: 4px;
+	margin: 0 20px 0 0;
+	color: #ed4226;
+	//border: 1px solid #efefef;
+	//width: 237px;
+	width: 20px;
+	z-index: 11;
+	//background: #fcfcfc;
+}*/
+/*.delivery_list #btn {
+	background: url(dropdown.png);
+	width: 17px;
+	height: 18px;
+	float: right;
+}*/
+/*.delivery_list span {
+	padding: 2px 0 0 2px;
+	display: block;
+	font-weight: bold;
+}*/
+.mini_button {
+	//z-index: 10;
+	//margin-top: -30px;
+	//margin-left: -5px;
+	//position: absolute;
+	width: 100%;
+	height: 20px;
+	padding: 0;
+	margin: 0;
+}
+
+.color_block ul.cities_list {
+	//margin-top: -10px;
+	margin-left: -5px;
+	z-index: 10;
+	//background: #fcfcfc;
+	position: absolute;
+	//border-radius: 5px;
+	//width: 249px;
+	padding: 0;
+	//border: 2px solid #eee;
+	border: 2px solid grey;
+	display: none;
+}
+ul.cities_list li {
+	//padding: 6px 9px;
+	padding: 2px 5px;
+	list-style-type: none;
+	//border-top: 1px solid #efefef;
+}
+ul.cities_list li:hover {
+	cursor: pointer;
+	background: #fff;
+}
+/*.color_block .delivery_text {
+	padding: 3px 5px;
+	margin: 5px 0 0 3px;
+}*/
+
+.color {
+	font-weight: bold;
+	text-align: center;
+}
+
+.table_plan {
+	font-family: Tahoma,Verdana,Arial,sans-serif;
+	font-size: 10px;
+	border:0;
+	padding:0;
+	border-collapse:collapse;
+}
+
+.plan {
+	color: #111111;
+	font-family: Tahoma,Verdana,Arial,sans-serif;
+	font-size: 10px;
+}
+
+
+.table_wrapper {
+	background-color: #A9A9A9;
+	text-align: center;
+}
+
+.calc {background-color: yellow; }
+.compl2 {background-color: #00FF00; }
+.error2 {background-color: #FF6600; }
+.compare {background-color: silver; text-decoration: line-through; }
+.select_plan {font-family: Tahoma,Verdana,Arial,sans-serif; FONT-SIZE: 10px;}
+				
+.in_page {
+	width: 100%;
+	height: auto;
+	position: fixed;
+	z-index:9999; 
+}
+
+input[name=file_input], #file_submit2 {
+    position: absolute;
+    left: 0;
+    top: 0;
+    //width: 100%;
+    //height: 100%;
+    width: 1px;
+    height: 1px;
+    transform: scale(20);
+    letter-spacing: 10em;     /* IE 9 fix */
+    -ms-transform: scale(20); /* IE 9 fix */
+    opacity: 0;
+    cursor: pointer
+}

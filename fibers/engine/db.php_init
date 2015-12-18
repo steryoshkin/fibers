@@ -1,0 +1,15 @@
+<?
+// подключение к базе, пока под временным логинпассом
+// логин пользователя БД
+	$user_db="user";
+// пароль пользователя БД
+	$user_pass="pass";
+// хост БД
+	$host_db="localhost";
+// БД
+	$db_name="fib";
+
+	//$conn_string = "host=$host_db port=5432 dbname=$db_name user=$user_db password=$user_pass";
+	$conn_string = "host=$host_db port=5432 dbname=$db_name user=$user_db password=$user_pass";
+	$con_id = pg_pconnect ($conn_string);
+?>

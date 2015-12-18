@@ -1,0 +1,87 @@
+<!doctype html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        #chartdiv
+        {
+            width	: 100%;
+            height	: 500px;
+        }
+    </style>
+</head>
+<body>
+<div id="chartdiv"></div>
+<script type="text/javascript" src="amcharts/amcharts.js"></script>
+<script type="text/javascript" src="amcharts/serial.js"></script>
+<script type="text/javascript" src="amcharts/themes/light.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+<script>
+    //    var chartData = generateChartData();
+    var chartData;
+
+    $.get("http://pto.rdtc.ru/fibers/engine/backend.php", {
+        act: "today"
+    }, function(result) {
+        eval(result);
+        chartData = count_small_Data;
+        make();
+    });
+
+    function make() {
+
+        var chart = AmCharts.makeChart("chartdiv", {
+            "type": "serial",
+            "theme": "none",
+            "pathToImages": "http://www.amcharts.com/lib/3/images/",
+            "legend": {
+                "useGraphSettings": true
+            },
+            "dataProvider": chartData,
+            "valueAxes": [{
+                "labelFunction": function(value) {
+                    return value.toString();
+                }
+            }],
+            "graphs": [{
+                "valueAxis": "v1",
+                "lineColor": "#FF6600",
+                "bullet": "round",
+                "bulletBorderThickness": 1,
+                "hideBulletsCount": 30,
+                "title": "Всего портов",
+                "valueField": "count",
+                "fillAlphas": 0
+            }, {
+                "valueAxis": "v2",
+                "lineColor": "#FCD202",
+                "bullet": "square",
+                "bulletBorderThickness": 1,
+                "hideBulletsCount": 30,
+                "title": "Занято поров",
+                "valueField": "count_free",
+                "fillAlphas": 0
+            }],
+            "chartScrollbar": {},
+            "chartCursor": {
+                "cursorPosition": "mouse"
+            },
+            "categoryField": "date",
+            "categoryAxis": {
+                "parseDates": true,
+                "axisColor": "#DADADA",
+                "minorGridEnabled": true
+            }
+        });
+
+        chart.addListener("dataUpdated", zoomChart);
+        zoomChart();
+
+        function zoomChart(){
+            chart.zoomToIndexes(chart.dataProvider.length - 20, chart.dataProvider.length - 1);
+        }
+    }
+</script>
+</body>
+</html>
+

@@ -1,0 +1,304 @@
+.clear { clear: both; margin: 0px; padding: 0px; }
+
+.container {
+	width: 100%;
+	height: 100%;
+	//border: 1px solid grey;
+}
+
+#map{
+	width: 100%;
+    height: 100%;
+    //margin-top: -50px;
+	//position:relative;
+    //z-index:100;
+}
+
+.panel-container {
+	top: 20px;
+	width: 99%;
+    //height: 24px;
+    //border: 1px solid grey;
+    //background: silver;
+    //opacity: 0.7; /* Значение прозрачности */
+    z-index: 999;
+    position: absolute;
+    text-align: center;
+    align: center;
+    //display: none;
+}
+
+.panel-sloc {
+	width: 506px;
+	/*width: 484px;*/
+	margin: auto;
+	/*padding 10px;
+	top: 20px;
+	left: 30%;
+	width: 90%;*/
+    height: 24px;
+    /*border-bottom: 1px solid grey;*/
+    background: #ecece7;
+    /*opacity: 0.8; /* Значение прозрачности */
+    /*z-index: 999;
+    position: absolute;*/
+    text-align: center;
+    display: none;
+    /*float: left;*/
+    border: 1px solid #9e9e93;
+    border-radius: 4px;
+}
+
+.panel-piu {
+	width: 120px;
+	/*width: 484px;*/
+	margin: auto;
+	/*padding 10px;
+	top: 20px;
+	left: 30%;
+	width: 90%;*/
+    height: 20px;
+    /*border-bottom: 1px solid grey;*/
+    background: #ecece7;
+    /*opacity: 0.8; /* Значение прозрачности */
+    /*z-index: 999;
+    position: absolute;*/
+    text-align: center;
+    display: none;
+    /*float: left;*/
+    border: 1px solid #9e9e93;
+    border-radius: 4px;
+    float: right;
+    font-family: 'isocpeur', Tahoma, Arial, sans-serif;
+    font-size: 14px;
+}
+
+#panel-legend {
+	top: -7px;
+	left: 32px;
+	width: 160px;
+	height: 156px;
+	/*width: 484px;*/
+	/*margin: auto;*/
+	/*padding 10px;*/
+	
+    /*border-bottom: 1px solid grey;*/
+    background: #ecece7;
+    /*opacity: 0.8; /* Значение прозрачности */
+    z-index: 999;
+    position: absolute;
+    text-align: left;
+    display: none;
+    /*float: left;*/
+    border: 1px solid #9e9e93;
+    border-radius: 4px;
+    float: right;
+    font-family: 'isocpeur', Tahoma, Arial, sans-serif;
+    font-size: 14px;
+}
+
+#sloc, #sloc_button, #sloc_button2, #sloc_clear_button, #find-close, #close_button {
+	border: 1px solid #9e9e93;
+    border-radius: 3px;
+    margin: 2px;
+}
+
+#sloc2 {
+	border: 1px solid red;
+    border-radius: 3px;
+    margin: 2px;
+    width: 352px;
+}
+
+#sloc {
+   	width: 352px;
+}
+
+#sloc_clear_button {
+   	width: 70px;
+}
+
+#sloc_button, #sloc_button2 {
+   	width: 50px;
+}
+
+#close_button, #find-close {
+	width: 18px;
+	height: 18px;
+}
+
+.autocomplete-suggestions {
+	border: 1px solid #999;
+	background: #FFF;
+	cursor: default;
+	overflow: auto;
+} 
+
+.clear {
+	clear: both;
+	margin: 0px;
+	padding: 0px;
+	height: 1px;
+}
+
+/*.button_nav {
+	width: 18px;
+    height: 18px;
+    border: none;
+    border-bottom: 1px solid grey;
+    border-right: 1px solid grey;
+    margin: 2px 0 0 0;
+}*/
+/*
+.find{
+    background-image: url(../geomap/find.png) !important;
+    background-position: 1px 1px;
+}
+
+.pan {
+    background-image: url(../geomap/pan.png) !important;
+    //background-position: 1px 1px;
+}
+      
+.ruler {
+    background-image: url(../geomap/ruler.png) !important;
+    background-position: 1px 1px;
+}*/
+/*
+.olControlNavToolbar div {
+  display:block;
+  width:  28px;
+  height: 28px;
+  top: 300px;
+  left: 6px;
+  position: relative;
+}
+.olControlNavToolbar .olControlNavigationItemActive {
+  background-image: url("img/panning-hand-on.png");
+  background-repeat: no-repeat;
+}
+.olControlNavToolbar .olControlNavigationItemInactive {
+  background-image: url("img/panning-hand-off.png");
+  background-repeat: no-repeat;
+}*/
+.olControlEditingToolbar {
+	left: 0;
+    width: 28px;
+    background: #ecece7;
+    border: 1px solid #9e9e93;
+    border-radius: 4px;
+}
+
+/*.olControlPanel .olControlDragPanItemActive {
+	background-image: url("http://www.somewebserver.net/images/pan-on-24.png");
+}
+.olControlPanel .olControlDragPanItemInactive {
+	background-image: url("http://www.somewebserver.net/images/pan-off-24.png");
+}
+.olControlPanel .olControlZoomBoxItemInactive {
+	background-image: url("http://www.openlayers.org/api/img/drag-rectangle-off.png");
+}
+.olControlPanel .olControlZoomBoxItemActive {
+	background-image: url("http://www.openlayers.org/api/img/drag-rectangle-on.png");
+}
+.olControlPanel .olControlZoomToMaxExtentItemInactive {
+	background-image: url("http://www.somewebserver.net/images/zoom-world-mini-24.png");
+}
+.olControlPanel .olControlFeatureInfoItemActive {
+	background-image: url("http://www.openlayers.org/api/img/query_mode_on.png");
+}
+.olControlPanel .olControlFeatureInfoItemInactive {
+	background-image: url("http://www.openlayers.org/api/img/query_mode_off.png");
+}
+.olControlPanel .olControlZoomOutBoxItemActive {
+	background-image: url("http://www.openlayers.org/api/img/zoom_out_on.png");
+}
+.olControlPanel .olControlZoomOutBoxItemInactive {
+	background-image: url("http://www.openlayers.org/api/img/zoom_out_off.png");
+}
+.olControlPanel .olControlMeasureItemActive {
+	background-image: url("http://www.somewebserver.net/images/measure-on-24.png");
+	cursor: crosshair;
+}*/
+
+.olControlNavigationItemActive {
+    background-image: url(../geomap/hand.png) !important;
+    background-position: -1px -24px !important;
+}
+
+.olControlNavigationItemInactive {
+    background-image: url(../geomap/hand.png) !important;
+    background-position: -1px -1px !important;
+}
+
+.olControlMeasureItemActive {
+    background-image: url(../geomap/ruler2.png) !important;
+    background-position: -1px -24px !important;
+}
+
+.olControlMeasureItemInactive {
+    background-image: url(../geomap/ruler2.png) !important;
+    background-position: -1px -1px !important;
+}
+
+.findItemActive {
+    background-image: url(../geomap/find2.png) !important;
+    background-position: -1px -24px !important;
+}
+
+.findItemInactive {
+    background-image: url(../geomap/find2.png) !important;
+    background-position: -1px -1px !important;
+}
+
+.legendItemActive {
+    background-image: url(../geomap/legend.png) !important;
+    background-position: -1px -24px !important;
+}
+
+.legendItemInactive {
+    background-image: url(../geomap/legend.png) !important;
+    background-position: -1px -1px !important;
+}
+
+.homeItemInactive {
+    background-image: url(../geomap/home.png) !important;
+    background-position: -1px -1px !important;
+}
+
+.exitItemInactive {
+    background-image: url(../geomap/exit.png) !important;
+    background-position: -1px -1px !important;
+}
+
+.olControlLoadingPanel {
+    background-image:url(../geomap/loading.gif);
+    margin-left: 40%;
+	/*margin-top: 25%;*/
+    position: relative;
+    width: 195px;
+    height: 11px;
+    background-position:center;
+    background-repeat:no-repeat;
+    display: none;
+}
+
+.egg_table {
+	width: 100%;
+    /*height: 11px;*/
+    border: 1px solid red;
+    font-family: 'isocpeur', Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    //margin: 0px;
+    //padding: 0;
+}
+
+.egg_table_div {
+	width: 100%;
+    /*height: 11px;*/
+    //border: 1px solid red;
+    font-family: 'isocpeur', Tahoma, Arial, sans-serif;
+    font-size: 16px;
+    //margin: 0px;
+    //padding: 0;
+}

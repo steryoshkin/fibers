@@ -1,0 +1,19 @@
+-- Table: fibers.keys
+
+-- DROP TABLE fibers.keys;
+
+CREATE TABLE fibers.keys
+(
+  id integer NOT NULL DEFAULT nextval('fibers.keys_id_seq'::regclass),
+  num character varying(255),
+  node_id integer,
+  descrip character varying(255),
+  user_id integer,
+  CONSTRAINT keys_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE,
+  autovacuum_enabled=true
+);
+ALTER TABLE fibers.keys
+  OWNER TO opengeo;
