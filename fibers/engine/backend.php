@@ -1,57 +1,11 @@
 <?php
 	//header('Access-Control-Allow-Origin: "*"');
-
 	include_once ('./setup.php');
 	include_once ('./db.php');
-	//include_once ('./simple_html_dom.php'); // для кузкома
 	include_once ('./parse_html.php');
 
     $user_id=@$_SESSION['logged_user_fibers_id'];
 
-// get_pg_img
-
-    if(isset($_GET['kml'])) {
-    	header("Pragma: public"); // required
-		header("Expires: 0");      
-        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-		header("Content-Type: application/kml; charset=utf8");
-        header('Content-Disposition: attachment; filename="file.kml"') ;
-        
-        $cable='';
-        
-        $sql = "SELECT
-        			st_askml(the_geom,1000) AS cable
-				FROM ".$table_cable." AS a";
-        $result = pg_query($sql);
-        
-        while ($row = pg_fetch_assoc($result)) {
-        	$cable.=$row['cable'];
-        }
-
-echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:ns2="http://www.google.com/kml/ext/2.2" xmlns:ns3="http://www.w3.org/2005/Atom" xmlns:ns4="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0">
-    <Document>
-		<Style id="yellowLineGreenPoly">
-			<LineStyle>
-				<color>7f00ffff</color>
-				<width>10</width>
-			</LineStyle>
-			<PolyStyle>
-				<color>7f00ff00</color>
-			</PolyStyle>
-		</Style>
-		<Placemark>
-			<name>Track 1</name>
-			<description>Red track</description>
-			<styleUrl>#yellowLineGreenPoly</styleUrl>
-				'.$cable.'
- 		</Placemark>
-    </Document>
-</kml>';
-        
-    	die;
-    }
-    
     if(isset($_GET['act']) && $_GET['act']=='get_pq_img' && is_numeric($_GET['pq_id'])) {
     	$sql = "SELECT a.id,
 				    CASE WHEN a.pq_1 = ".clean($_GET['pq_id'])." THEN pq_1 ELSE pq_2 END AS pq_1,
@@ -3696,9 +3650,88 @@ function set_color($table,$id,$type,$color_id) {
     	die;
     }
 
-//function fib_find($id,$last_id,$to_pq,$to_node_id,$first) {
-function fib_find($id,$last_id,$to_node_id) {
-	//echo ' 1: '.$id.' 2: '.$last_id.' 3: '.$to_node_id;
+// вывод отслеживания соединения волокон на карту
+    if(isset($_GET['act']) && $_GET['act']=='find_fiber' && @is_numeric($_GET['fiber_id'])) {
+    	// массив для линий
+    	global $array_line;
+    	$array_line = array();
+    	// массив для точек
+    	global $array_point;
+    	$array_point = array();
+
+    	header('Content-Type: application/json');
+
+    	$node_id = (is_numeric($_GET['node'])?clean($_GET['node']):0);
+    	$fiber_id = clean($_GET['fiber_id']);
+    	$sql="SELECT CASE WHEN fc.fiber_id_1 = ".$fiber_id." THEN fc.fiber_id_2 ELSE fc.fiber_id_1 END AS to_fiber FROM ".$table_fiber_conn." AS fc WHERE (fiber_id_1 = ".$fiber_id." OR fiber_id_2 = ".$fiber_id.")";
+
+    	$result = pg_query($sql);
+    	if (pg_num_rows($result)) {
+    		while ($row = pg_fetch_assoc($result)) {
+    			//echo $fiber_id.' '.$row['to_fiber'].'<br>';
+    			fib_find($fiber_id,$row['to_fiber'],$node_id,true);
+    			fib_find($row['to_fiber'],$fiber_id,$node_id,true);
+    		}
+    	}
+    	$sql="SELECT ST_AsGeoJSON(c1.the_geom) AS the_geom
+				FROM ".$table_fiber." AS f1, ".$table_cable." AS c1
+				WHERE
+					f1.id = ".$fiber_id."
+				AND
+					f1.cable_id = c1.id";
+    	$result=pg_fetch_assoc(pg_query($sql));
+    	$array_line[] = $result['the_geom'];
+
+    	$array_line = array_unique($array_line);
+    	$array_point = array_unique($array_point);
+
+    	$geom = '{ "type": "FeatureCollection",
+	"features":[
+		';
+    	$total = count($array_line);
+    	$counter = 0;
+    	$pre = '{"type":"Feature", "properties":{"strokeColor":"#ff4500", "strokeWidth":5}, "geometry":';
+    	foreach ($array_line as $line) {
+    		$counter++;
+    		if ($counter == $total) {
+    			$geom .= $pre.$line.'}
+	';
+    		}
+    		else {
+    			$geom .= $pre.$line.'},
+		';
+    		}
+    	}
+    	$total = count($array_point);
+    	$counter = 0;
+    	if($total>0) $geom .=",";
+    	$pre = '{"type":"Feature", "properties":{"strokeColor":"black", "fillColor":"yellow","pointRadius": 8, "strokeWidth":1.5}, "geometry":';
+    	foreach ($array_point as $line) {
+    		$counter++;
+    		if ($counter == $total) {
+    			$geom .= $pre.$line.'}
+	';
+    		}
+    		else {
+    			$geom .= $pre.$line.'},
+		';
+    		}
+    	}
+
+    	$geom .= ']
+}';
+    	echo $geom;
+    	//echo fib_find(clean($_GET['fiber_id']),0,$geom);
+    	//echo fib_find(clean($_GET['fiber_id']),0,0,$geom);
+/*    	print_r($array_line);
+    	$array_line = array_unique($array_line);
+    	print_r($array_line);*/
+    	//print_r($array_point);
+    	die;
+    }
+
+function fib_find($id,$last_id,$to_node_id,$geom=false) {
+	//echo ' 1: '.$id.' 2: '.$last_id.' 3: '.$to_node_id.'<br>';
 	//die;
 	global $table_cruz_conn;
 	global $table_fiber_conn;
@@ -3708,12 +3741,16 @@ function fib_find($id,$last_id,$to_node_id) {
 	global $table_pq_type;
 	global $table_node;
 	global $table_color;
+	global $array_line;
+	global $array_point;
 
 	$sql='
 	SELECT
 	f1.id AS id, f1.num AS num, n1.id AS from_node_id,
 	CASE WHEN p1.node = n1.id THEN p1.id ELSE p2.id END AS from_pq_id,
 	c1.id AS from_cable_id,
+	ST_AsGeoJSON(c1.the_geom) AS the_geom1,
+	ST_AsGeoJSON(c2.the_geom) AS the_geom2,
 
 	f2.id AS to_id, f2.num AS to_num, n2.id AS to_node_id,
 	CASE WHEN p3.node = n2.id THEN p3.id ELSE p4.id END AS to_pq_id,
@@ -3748,10 +3785,11 @@ function fib_find($id,$last_id,$to_node_id) {
 	f2.id = CASE WHEN fc1.fiber_id_1 = '.$id.' THEN fc1.fiber_id_2 ELSE fc1.fiber_id_1 END
 	AND
 	c2.id = f2.cable_id
-	AND c_n.id = '.$to_node_id.'
-	';
+	'.($to_node_id>0?'AND c_n.id = '.$to_node_id:"");
 
-	//print_r('<pre>'.$sql.'</pre>');
+	//echo "|".($to_node_id>0?'AND c_n.id = '.$to_node_id:"")."|";
+	
+//	print_r('<pre>'.$sql.'</pre>');
 	//echo 'last_id: '.$last_id.' id: '.$id.'<br>';
 	$result=@pg_fetch_assoc(pg_query($sql));
 /*
@@ -3761,95 +3799,116 @@ function fib_find($id,$last_id,$to_node_id) {
 */
 	if($result) {
 		//echo 'curr_pq: '.$result['curr_pq_id'].'<br>';
+		//print_r('<pre>'.$sql.'</pre><hr>');
 
-		$sql_color='SELECT
-					col1.name AS mod_name_1, col1.color AS mod_color_1, col1.stroke AS mod_stroke_1,
-					col2.name AS fib_name_1, col2.color AS fib_color_1, col2.stroke AS fib_stroke_1,
-					col3.name AS mod_name_2, col3.color AS mod_color_2, col3.stroke AS mod_stroke_2,
-					col4.name AS fib_name_2, col4.color AS fib_color_2, col4.stroke AS fib_stroke_2
-				FROM '.$table_color.'
-				LEFT JOIN '.$table_color.' AS col1 ON '.$result['mod_color_1'].' = col1.id AND col1.type = 0
-				LEFT JOIN '.$table_color.' AS col2 ON '.$result['fib_color_1'].' = col2.id AND col2.type = 1
-		
-				LEFT JOIN '.$table_color.' AS col3 ON '.$result['mod_color_2'].' = col3.id AND col3.type = 0
-				LEFT JOIN '.$table_color.' AS col4 ON '.$result['fib_color_2'].' = col4.id AND col4.type = 1
-				LIMIT 1';
-		//print_r('<pre>'.$sql_color.'</pre>');
-		$result_color=pg_fetch_assoc(pg_query($sql_color));
-		/////
-		// вывод номеров портов
-		// волокно 1
-		$sql_c1="SELECT * FROM ".$table_pq." AS p1, ".$table_cruz_conn." AS cc1 WHERE p1.node = ".$result['curr_node_id']." AND cc1.fiber_id = ".$result['id']." AND p1.id = cc1.pq_id";
-		$result_c1=pg_fetch_assoc(pg_query($sql_c1));
-
-		if(isset($result_c1['port'])) $port1=$result_c1['port'];
-		// волокно 2
-		$sql_c2="SELECT * FROM ".$table_pq." AS p1, ".$table_cruz_conn." AS cc1 WHERE p1.node = ".$result['curr_node_id']." AND cc1.fiber_id = ".$result['to_id']." AND p1.id = cc1.pq_id";
-		$result_c2=pg_fetch_assoc(pg_query($sql_c2));
-		if(isset($result_c2['port'])) $port2=$result_c2['port'];
-
-        //echo 'port_1: '.$result_c1['port'].' port_2: '.$result_c2['port'];
-		// если кроссы не совподают, то выводить номер кросса
-		if($result_c1['pq_id'] != $result_c2['pq_id']) {
-            if($result_c1['type']==0) $type1='Кросс'; else $type1='Муфта';
-            if(isset($result_c1['num'])) $num1.='№'.$result_c1['num']; else $num1.='';
-                
-            if($result_c2['type']==0) $type2='Кросс'; else $type2='Муфта';
-            if(isset($result_c2['num'])) $num2.='№'.$result_c2['num']; else $num2.='';
-
-            if($type1==$type2) $cruz='<div class="show_find_pq_legend">'.$type1.':</div><div class="show_find_pq_lfib"><a class="isoc" href="?act=s_cable&pq_id='.$result_c1['pq_id'].'" target="_blank">'.$num1.'</a></div><div class="show_find_pq_rfib"><a class="isoc" href="?act=s_cable&pq_id='.$result_c2['pq_id'].'" target="_blank">'.$num2.'</a></div>';
+		if(!$geom) {
+			$sql_color='SELECT
+						col1.name AS mod_name_1, col1.color AS mod_color_1, col1.stroke AS mod_stroke_1,
+						col2.name AS fib_name_1, col2.color AS fib_color_1, col2.stroke AS fib_stroke_1,
+						col3.name AS mod_name_2, col3.color AS mod_color_2, col3.stroke AS mod_stroke_2,
+						col4.name AS fib_name_2, col4.color AS fib_color_2, col4.stroke AS fib_stroke_2
+					FROM '.$table_color.'
+					LEFT JOIN '.$table_color.' AS col1 ON '.$result['mod_color_1'].' = col1.id AND col1.type = 0
+					LEFT JOIN '.$table_color.' AS col2 ON '.$result['fib_color_1'].' = col2.id AND col2.type = 1
+			
+					LEFT JOIN '.$table_color.' AS col3 ON '.$result['mod_color_2'].' = col3.id AND col3.type = 0
+					LEFT JOIN '.$table_color.' AS col4 ON '.$result['fib_color_2'].' = col4.id AND col4.type = 1
+					LIMIT 1';
+			//print_r('<pre>'.$sql_color.'</pre>');
+			$result_color=pg_fetch_assoc(pg_query($sql_color));
+			/////
+			// вывод номеров портов
+			// волокно 1
+			$sql_c1="SELECT * FROM ".$table_pq." AS p1, ".$table_cruz_conn." AS cc1 WHERE p1.node = ".$result['curr_node_id']." AND cc1.fiber_id = ".$result['id']." AND p1.id = cc1.pq_id";
+			$result_c1=pg_fetch_assoc(pg_query($sql_c1));
+	
+			if(isset($result_c1['port'])) $port1=$result_c1['port'];
+			// волокно 2
+			$sql_c2="SELECT * FROM ".$table_pq." AS p1, ".$table_cruz_conn." AS cc1 WHERE p1.node = ".$result['curr_node_id']." AND cc1.fiber_id = ".$result['to_id']." AND p1.id = cc1.pq_id";
+			$result_c2=pg_fetch_assoc(pg_query($sql_c2));
+			if(isset($result_c2['port'])) $port2=$result_c2['port'];
+	
+	        //echo 'port_1: '.$result_c1['port'].' port_2: '.$result_c2['port'];
+			// если кроссы не совподают, то выводить номер кросса
+			if($result_c1['pq_id'] != $result_c2['pq_id']) {
+	            if($result_c1['type']==0) $type1='Кросс'; else $type1='Муфта';
+	            if(isset($result_c1['num'])) $num1.='№'.$result_c1['num']; else $num1.='';
+	                
+	            if($result_c2['type']==0) $type2='Кросс'; else $type2='Муфта';
+	            if(isset($result_c2['num'])) $num2.='№'.$result_c2['num']; else $num2.='';
+	
+	            if($type1==$type2) $cruz='<div class="show_find_pq_legend">'.$type1.':</div><div class="show_find_pq_lfib"><a class="isoc" href="?act=s_cable&pq_id='.$result_c1['pq_id'].'" target="_blank">'.$num1.'</a></div><div class="show_find_pq_rfib"><a class="isoc" href="?act=s_cable&pq_id='.$result_c2['pq_id'].'" target="_blank">'.$num2.'</a></div>';
+			} else {
+				$sql_c="SELECT * FROM ".$table_pq." AS p1, ".$table_pq_type." AS pt WHERE p1.id = ".$result['curr_pq_id']." AND p1.pq_type_id = pt.id";
+				$result_c=pg_fetch_assoc(pg_query($sql_c));
+	
+				$num='';
+				if($result_c['type']==0) $type='Кросс'; else $type='Муфта';
+				if(isset($result_c['num'])) $num.='№'.$result_c['num']; else $num.='';
+	
+				if(!$num) $num = '№1';
+				$cruz='<div class="show_find_pq_legend">'.$type.':</div><div class="show_find_pq_fib"><a class="isoc" href="?act=s_cable&pq_id='.$result['curr_pq_id'].'" target="_blank">&nbsp;'.$num.'&nbsp;</a></div>';
+			}
+	
+	        // если заданы порты, то выводим
+	        if($result_c1 && $result_c2) {
+	            $port='<div class="show_find_pq_legend border_top">Порт:</div><div class="show_find_pq_lfib border_top">'.$port1.'</div><div class="show_find_pq_rfib border_top">'.$port2.'</div>';
+	
+	        } else {
+	            $port='<div class="show_find_pq_legend border_top">&nbsp;</div><div class="show_find_pq_lfib border_top">&nbsp;</div><div class="show_find_pq_rfib border_top">&nbsp;</div>';
+	
+	        }
+	
+			$text='
+			<div class="show_find_pq">
+			<div class="show_find_pq_title'.($result['incorrect']==true?' bg-color-orangeDark':'').'">
+			<a class="isoc'.($result['incorrect']==true?' bg-color-orangeDark':'').'" href="?act=s_pq&node_id='.$result['curr_node_id'].'" target="_blank">'.$result['curr_node_addr'].'</a>
+			</div>';
+			$text.=$cruz;
+			$text.='
+			<div class="show_find_pq_legend border_top">ОВ:</div><div class="show_find_pq_lfib border_top">'.$result['num'].'</div><div class="show_find_pq_rfib border_top">'.$result['to_num'].'</div>';
+			$text.='
+			<div class="show_find_pq_legend border_top">цвет:</div>
+			<div class="show_find_pq_lfib border_top">
+					<div class="show_find_pq_mod_color" title="Цвет модуля: '.($result_color['mod_name_1']?$result_color['mod_name_1']:'не задан').'" style="background-color: '.$result_color['mod_color_1'].'">'.($result_color['mod_stroke_1']?'/':'&nbsp;').'</div>
+					<div class="show_find_pq_fib_color" title="Цвет волокна: '.($result_color['fib_name_1']?$result_color['fib_name_1']:'не задан').'" style="background-color: '.$result_color['fib_color_1'].'">'.($result_color['fib_stroke_1']?'/':'&nbsp;').'</div>
+					<div class="clear"></div>
+			</div>
+			<div class="show_find_pq_rfib border_top">
+					<div class="show_find_pq_mod_color" title="Цвет модуля: '.($result_color['mod_name_2']?$result_color['mod_name_2']:'не задан').'" style="background-color: '.$result_color['mod_color_2'].'">'.($result_color['mod_stroke_2']?'/':'&nbsp;').'</div>
+					<div class="show_find_pq_fib_color" title="Цвет волокна: '.($result_color['fib_name_2']?$result_color['fib_name_2']:'не задан').'" style="background-color: '.$result_color['fib_color_2'].'">'.($result_color['fib_stroke_2']?'/':'&nbsp;').'</div>
+					<div class="clear"></div>
+			</div>';
+			$text.=$port;
+			$text.='
+			</div>';
+			$text.='<div class="show_find_pq_arrow">></div>';
+			echo $text;
 		} else {
-			$sql_c="SELECT * FROM ".$table_pq." AS p1, ".$table_pq_type." AS pt WHERE p1.id = ".$result['curr_pq_id']." AND p1.pq_type_id = pt.id";
-			$result_c=pg_fetch_assoc(pg_query($sql_c));
+			// занесение координат кабелей в массив
+			if($last_cable_id != $result['from_cable_id']) {
+				$array_line[] = $result['the_geom1'];
+			} else {
+				$array_line[] = $result['the_geom2'];
+			}
 
-			$num='';
-			if($result_c['type']==0) $type='Кросс'; else $type='Муфта';
-			if(isset($result_c['num'])) $num.='№'.$result_c['num']; else $num.='';
+			// занесение координат узла в массив, если шос
+			// волокно 1
+			$sql_c1="SELECT *, ST_AsGeoJSON(n1.the_geom) AS the_geom FROM ".$table_pq." AS p1, ".$table_cruz_conn." AS cc1, ".$table_node." AS n1 WHERE p1.node = ".$result['curr_node_id']." AND cc1.fiber_id = ".$result['id']." AND p1.id = cc1.pq_id AND n1.id = p1.node";
+			$result_c1=pg_fetch_assoc(pg_query($sql_c1));
+			// волокно 2
+			$sql_c2="SELECT *, ST_AsGeoJSON(n1.the_geom) AS the_geom FROM ".$table_pq." AS p1, ".$table_cruz_conn." AS cc1 ".$table_node." AS n1 WHERE p1.node = ".$result['curr_node_id']." AND cc1.fiber_id = ".$result['to_id']." AND p1.id = cc1.pq_id AND n1.id = p1.node";
+			$result_c2=pg_fetch_assoc(pg_query($sql_c2));
 
-			if(!$num) $num = '№1';
-			$cruz='<div class="show_find_pq_legend">'.$type.':</div><div class="show_find_pq_fib"><a class="isoc" href="?act=s_cable&pq_id='.$result['curr_pq_id'].'" target="_blank">&nbsp;'.$num.'&nbsp;</a></div>';
+			if(isset($result_c1['port']) || isset($result_c2['port'])) $array_point[] = $result_c1['the_geom'];
 		}
-
-        // если заданы порты, то выводим
-        if($result_c1 && $result_c2) {
-            $port='<div class="show_find_pq_legend border_top">Порт:</div><div class="show_find_pq_lfib border_top">'.$port1.'</div><div class="show_find_pq_rfib border_top">'.$port2.'</div>';
-
-        } else {
-            $port='<div class="show_find_pq_legend border_top">&nbsp;</div><div class="show_find_pq_lfib border_top">&nbsp;</div><div class="show_find_pq_rfib border_top">&nbsp;</div>';
-
-        }
-
-		$text='
-		<div class="show_find_pq">
-		<div class="show_find_pq_title'.($result['incorrect']==true?' bg-color-orangeDark':'').'">
-		<a class="isoc'.($result['incorrect']==true?' bg-color-orangeDark':'').'" href="?act=s_pq&node_id='.$result['curr_node_id'].'" target="_blank">'.$result['curr_node_addr'].'</a>
-		</div>';
-		$text.=$cruz;
-		$text.='
-		<div class="show_find_pq_legend border_top">ОВ:</div><div class="show_find_pq_lfib border_top">'.$result['num'].'</div><div class="show_find_pq_rfib border_top">'.$result['to_num'].'</div>';
-		$text.='
-		<div class="show_find_pq_legend border_top">цвет:</div>
-		<div class="show_find_pq_lfib border_top">
-				<div class="show_find_pq_mod_color" title="Цвет модуля: '.($result_color['mod_name_1']?$result_color['mod_name_1']:'не задан').'" style="background-color: '.$result_color['mod_color_1'].'">'.($result_color['mod_stroke_1']?'/':'&nbsp;').'</div>
-				<div class="show_find_pq_fib_color" title="Цвет волокна: '.($result_color['fib_name_1']?$result_color['fib_name_1']:'не задан').'" style="background-color: '.$result_color['fib_color_1'].'">'.($result_color['fib_stroke_1']?'/':'&nbsp;').'</div>
-				<div class="clear"></div>
-		</div>
-		<div class="show_find_pq_rfib border_top">
-				<div class="show_find_pq_mod_color" title="Цвет модуля: '.($result_color['mod_name_2']?$result_color['mod_name_2']:'не задан').'" style="background-color: '.$result_color['mod_color_2'].'">'.($result_color['mod_stroke_2']?'/':'&nbsp;').'</div>
-				<div class="show_find_pq_fib_color" title="Цвет волокна: '.($result_color['fib_name_2']?$result_color['fib_name_2']:'не задан').'" style="background-color: '.$result_color['fib_color_2'].'">'.($result_color['fib_stroke_2']?'/':'&nbsp;').'</div>
-				<div class="clear"></div>
-		</div>';
-		$text.=$port;
-		$text.='
-		</div>';
-		$text.='<div class="show_find_pq_arrow">></div>';
-		echo $text;
-		echo fib_find($result['to_id'],$result['id'],$result['to_node_id']);
+		echo fib_find($result['to_id'],$result['id'],$result['to_node_id'],$geom);
 	} else {
         $sql2='
         SELECT
         	f1.id AS id, f1.num AS num, n1.id AS curr_node_id, n1.address AS curr_node_addr, n1.incorrect, n1.descrip AS curr_node_descrip, p1.id AS curr_pq_id,
-        	f1.mod_color AS mod_color, f1.fib_color AS fib_color
+        	f1.mod_color AS mod_color, f1.fib_color AS fib_color,
+        	ST_AsGeoJSON(c1.the_geom) AS the_geom
         FROM '.$table_fiber.' AS f1, '.$table_cable.' AS c1, '.$table_pq.' AS p1, '.$table_node.' AS n1
         WHERE
         f1.id = '.$id.'
@@ -3857,52 +3916,66 @@ function fib_find($id,$last_id,$to_node_id) {
         c1.id = f1.cable_id
         AND
         ( c1.pq_1 = p1.id OR c1.pq_2 = p1.id)
-        AND
-        p1.node = '.$to_node_id.'
+		'.($to_node_id>0?'AND p1.node = '.$to_node_id:"").'
         AND
         n1.id = p1.node
         ';
-		$result2=pg_fetch_assoc(pg_query($sql2));
-		
-		$sql_color='SELECT
-					col1.name AS mod_name, col1.color AS mod_color, col1.stroke AS mod_stroke,
-					col2.name AS fib_name, col2.color AS fib_color, col2.stroke AS fib_stroke
-				FROM '.$table_color.'
-				LEFT JOIN '.$table_color.' AS col1 ON '.$result2['mod_color'].' = col1.id AND col1.type = 0
-				LEFT JOIN '.$table_color.' AS col2 ON '.$result2['fib_color'].' = col2.id AND col2.type = 1
-				LIMIT 1';
-		//print_r('<pre>'.$sql_color.'</pre>');
-		$result_color=pg_fetch_assoc(pg_query($sql_color));
 
-		//$sql_c="SELECT * FROM ".$table_pq." AS p1 WHERE p1.id = ".$result2['curr_pq_id'];
-		$sql_c="SELECT * FROM ".$table_pq." AS p1, ".$table_pq_type." AS pt WHERE p1.id = ".$result2['curr_pq_id']." AND p1.pq_type_id = pt.id";
+        //print_r('<pre>'.$sql2.'</pre>');
 
-		$result_c=pg_fetch_assoc(pg_query($sql_c));
-		$sql_cc="SELECT * FROM ".$table_cruz_conn." AS cc1 WHERE cc1.fiber_id = ".$result2['id']." AND cc1.pq_id = ".$result2['curr_pq_id']."";
-		$result_cc=pg_fetch_assoc(pg_query($sql_cc));
-
-		$num='';
-		if($result_c['type']==0) $type='Кросс'; else $type='Муфта';
-		if(isset($result_c['num'])) $num.='№'.$result_c['num']; else $num.='';
-		if(!$num) $num = '№1';
-
-		$text='
-		<div class="show_find_pq">
-		<div class="show_find_pq_title'.($result2['incorrect']==true?' bg-color-orangeDark':'').'">
-		<a class="isoc '.($result2['incorrect']==true?' bg-color-orangeDark':'').'" href="?act=s_pq&node_id='.$result2['curr_node_id'].'" target="_blank">'.$result2['curr_node_addr'].'</a>
-		</div>
-		<div class="show_find_pq_legend">'.$type.':</div><div class="show_find_pq_fib"><a class="isoc" href="?act=s_cable&pq_id='.$result2['curr_pq_id'].'" target="_blank">&nbsp;'.$num.'&nbsp;</a></div>
-		<div class="show_find_pq_legend border_top">ОВ:</div><div class="show_find_pq_fib border_top">'.$result2['num'].'</div>
-		<div class="show_find_pq_legend border_top">цвет:</div>
-		<div class="show_find_pq_fib border_top">
-				<div class="show_find_pq_mod_color w30" title="Цвет модуля: '.($result_color['mod_name']?$result_color['mod_name']:'не задан').'" style="background-color: '.$result_color['mod_color'].'">'.($result_color['mod_stroke']?'/':'&nbsp;').'</div>
-				<div class="show_find_pq_fib_color w30" title="Цвет волокна: '.($result_color['fib_name']?$result_color['fib_name']:'не задан').'" style="background-color: '.$result_color['fib_color'].'">'.($result_color['fib_stroke']?'/':'&nbsp;').'</div>
-				<div class="clear"></div>
-		</div>
-		<div class="show_find_pq_legend border_top">Порт:</div><div class="show_find_pq_fib border_top">'.$result_cc['port'].'</div>';
-		if($result_cc['descrip']) $text.='<div class="show_find_pq_descrip border_top">'.$result_cc['descrip'].'</div>';
-		$text.='</div>';
-		echo $text;
+		if(!$geom) {
+			$result2=pg_fetch_assoc(pg_query($sql2));
+			$sql_color='SELECT
+						col1.name AS mod_name, col1.color AS mod_color, col1.stroke AS mod_stroke,
+						col2.name AS fib_name, col2.color AS fib_color, col2.stroke AS fib_stroke
+					FROM '.$table_color.'
+					LEFT JOIN '.$table_color.' AS col1 ON '.$result2['mod_color'].' = col1.id AND col1.type = 0
+					LEFT JOIN '.$table_color.' AS col2 ON '.$result2['fib_color'].' = col2.id AND col2.type = 1
+					LIMIT 1';
+			//print_r('<pre>'.$sql_color.'</pre>');
+			$result_color=pg_fetch_assoc(pg_query($sql_color));
+	
+			//$sql_c="SELECT * FROM ".$table_pq." AS p1 WHERE p1.id = ".$result2['curr_pq_id'];
+			$sql_c="SELECT * FROM ".$table_pq." AS p1, ".$table_pq_type." AS pt WHERE p1.id = ".$result2['curr_pq_id']." AND p1.pq_type_id = pt.id";
+	
+			$result_c=pg_fetch_assoc(pg_query($sql_c));
+			$sql_cc="SELECT * FROM ".$table_cruz_conn." AS cc1 WHERE cc1.fiber_id = ".$result2['id']." AND cc1.pq_id = ".$result2['curr_pq_id']."";
+			$result_cc=pg_fetch_assoc(pg_query($sql_cc));
+	
+			$num='';
+			if($result_c['type']==0) $type='Кросс'; else $type='Муфта';
+			if(isset($result_c['num'])) $num.='№'.$result_c['num']; else $num.='';
+			if(!$num) $num = '№1';
+	
+			$text='
+			<div class="show_find_pq">
+			<div class="show_find_pq_title'.($result2['incorrect']==true?' bg-color-orangeDark':'').'">
+			<a class="isoc '.($result2['incorrect']==true?' bg-color-orangeDark':'').'" href="?act=s_pq&node_id='.$result2['curr_node_id'].'" target="_blank">'.$result2['curr_node_addr'].'</a>
+			</div>
+			<div class="show_find_pq_legend">'.$type.':</div><div class="show_find_pq_fib"><a class="isoc" href="?act=s_cable&pq_id='.$result2['curr_pq_id'].'" target="_blank">&nbsp;'.$num.'&nbsp;</a></div>
+			<div class="show_find_pq_legend border_top">ОВ:</div><div class="show_find_pq_fib border_top">'.$result2['num'].'</div>
+			<div class="show_find_pq_legend border_top">цвет:</div>
+			<div class="show_find_pq_fib border_top">
+					<div class="show_find_pq_mod_color w30" title="Цвет модуля: '.($result_color['mod_name']?$result_color['mod_name']:'не задан').'" style="background-color: '.$result_color['mod_color'].'">'.($result_color['mod_stroke']?'/':'&nbsp;').'</div>
+					<div class="show_find_pq_fib_color w30" title="Цвет волокна: '.($result_color['fib_name']?$result_color['fib_name']:'не задан').'" style="background-color: '.$result_color['fib_color'].'">'.($result_color['fib_stroke']?'/':'&nbsp;').'</div>
+					<div class="clear"></div>
+			</div>
+			<div class="show_find_pq_legend border_top">Порт:</div><div class="show_find_pq_fib border_top">'.$result_cc['port'].'</div>';
+			if($result_cc['descrip']) $text.='<div class="show_find_pq_descrip border_top">'.$result_cc['descrip'].'</div>';
+			$text.='</div>';
+			echo $text;
+		} else {
+			$result2 = pg_query($sql2);
+			if (pg_num_rows($result2)) {
+				while ($row2 = pg_fetch_assoc($result2)) {
+					$array_line[] = $row2['the_geom'];
+					// занесение координат узла в массив, если шос
+					$sql_cc="SELECT *, ST_AsGeoJSON(n1.the_geom) AS the_geom FROM ".$table_cruz_conn." AS cc1, ".$table_node." AS n1, ".$table_pq." AS p1 WHERE cc1.fiber_id = ".$row2['id']." AND cc1.pq_id = ".$row2['curr_pq_id']." AND p1.node = n1.id AND cc1.pq_id = p1.id";
+					$result_cc=pg_fetch_assoc(pg_query($sql_cc));
+					if(isset($result_cc['port'])) $array_point[] = $result_cc['the_geom'];
+				}
+			}
+		}
 	}
 	//die;
 }

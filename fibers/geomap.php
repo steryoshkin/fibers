@@ -132,23 +132,9 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
 		            numZoomLevels: 19
 	            }
 			);
-
-			var kml = new OpenLayers.Layer.Vector("KML", {
-		        //strategies: [new OpenLayers.Strategy.Fixed()],
-		        strategies: [new OpenLayers.Strategy.BBOX()],
-		        protocol: new OpenLayers.Protocol.HTTP({
-		            url: "/fibers/engine/backend.php?kml",
-		            format: new OpenLayers.Format.KML({
-		                extractStyles: true, 
-		                extractAttributes: true
-		                //,maxDepth: 2
-		            })
-		        })
-		    });
-
-		    kml.setVisibility(true);
 <?php
-	if($group_access['map_type']==1) echo
+	if($group_access['map_type']==1) {
+		echo
 			"var maps = new OpenLayers.Layer.WMS(
 				'Карта сети',
 				'http://".$host.":8080/geoserver/opengeo/wms',
@@ -160,22 +146,50 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
 				}
 			);";
 
-	//if(empty($_GET['baselayer']) || $_GET['baselayer']==$osm_map_name)
-	if($layer==$osm_map_name)
-		echo "map.addLayers([OSM,google_sat,gis]);";
-	else if($layer==$google_sat_map_name)
-		echo "map.addLayers([google_sat,OSM,gis]);";
-	else if($layer==$gis_map_name)
-		echo "map.addLayers([gis,google_sat,OSM]);";
+		if($layer==$osm_map_name)
+			echo "map.addLayers([OSM,google_sat,gis]);";
+		else if($layer==$google_sat_map_name)
+			echo "map.addLayers([google_sat,OSM,gis]);";
+		else if($layer==$gis_map_name)
+			echo "map.addLayers([gis,google_sat,OSM]);";
 
-//	if($group_access['map_type']==1) {
-			echo "map.addLayers([maps,kml]);";
-			//echo "map.addLayers([kml]);";
-//	}
-
-//	if($group_access['map_type']==2) echo
-//			"map.addLayer(rdtc_map_abon);";
-
+		echo "map.addLayers([maps]);";
+		
+		if(is_numeric($_GET['find_fiber'])) {
+				echo '
+				var gardenStyle = new OpenLayers.Style({
+					"strokeWidth":"${strokeWidth}",
+					"strokeColor":"${strokeColor}",
+					"fillColor":"${fillColor}",
+					"pointRadius":"${pointRadius}"
+				});
+				var gardenStyle2 = new OpenLayers.Style({
+					"strokeWidth":8,
+					"fillColor":"#fff",
+					"strokeColor":"#ffdd00"
+				});
+				var selectedGardenStyle = new OpenLayers.Style({
+					"strokeWidth":4,
+					"fillColor":"#00fffb",
+					"strokeColor":"#0000ff"
+				});
+				var gardenStyleMap = new OpenLayers.StyleMap({"default": gardenStyle,"Feature": selectedGardenStyle});
+			
+				var geojson_layer = new OpenLayers.Layer.Vector("GeoJSON", {
+					styleMap: gardenStyleMap,
+					strategies: [new OpenLayers.Strategy.Fixed()],
+					protocol: new OpenLayers.Protocol.HTTP({
+						url: "engine/backend.php?act=find_fiber&fiber_id='.clean($_GET['find_fiber']).'",
+						format: new OpenLayers.Format.GeoJSON({
+							"internalProjection": toProjection,
+							"externalProjection": fromProjection
+						})
+					})
+				});
+				map.addLayer(geojson_layer);
+            	';
+			}
+	}
 ?>
             map.addControl(new OpenLayers.Control.Navigation());
             //map.addControl(new OpenLayers.Control.LayerSwitcher());
@@ -374,7 +388,8 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
             	var lon = center.lon;
             	var zoom = map.getZoom();
             	var layers = map.getLayersBy("visibility", true);
-            	history.pushState(1, "", "?lat="+lat+"&lon="+lon+"&zoom="+zoom+"&baselayer="+layers[0].name+find);
+            	//history.pushState(1, "", "?lat="+lat+"&lon="+lon+"&zoom="+zoom+"&baselayer="+layers[0].name+find);
+            	history.pushState(1, "", "?lat="+lat+"&lon="+lon+"&zoom="+zoom+"&baselayer="+layers[0].name+find+"<?php if(is_numeric($_GET['find_fiber'])) echo "&find_fiber=".clean($_GET['find_fiber']);?>");
             };
 
             function findLayerClick(event) {

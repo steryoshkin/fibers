@@ -70,7 +70,6 @@ function show_menu() {
                         </ul>
                     </li>
     				'.($group_access['dirs_users']?'<li><a href="?act=dirs&dir=users">Пользователи</a></li>':'').'
-            		'.($group_access['dirs_users']?'<li><a href="?act=waypoint">Путевые точки</a></li>':'').'
                 </ul>
             </li>':'').
             ($group_access['u_const']?'<li><a href="?act=u_const">Узлы в строительстве</a></li>':'').'
@@ -1883,11 +1882,14 @@ if (isset($_GET['act']) && ( $_GET['act'] == 's_cable' || $_GET['act'] == 's_por
     // id кросса/муфты
     $pq_id = clean($_GET['pq_id']);
     // навигация
-    $sql="SELECT n1.id AS id, pt.type AS type, p1.num AS num, LEFT(p1.descrip, 15) AS descrip FROM ".$table_pq." AS p1 , ".$table_node." AS n1, ".$table_pq_type." AS pt WHERE p1.node = n1.id AND p1.id=" . $_GET['pq_id'] . " AND p1.pq_type_id = pt.id;";
+    $sql="SELECT n1.id AS id, pt.type AS type, p1.num AS num, LEFT(p1.descrip, 15) AS descrip, ST_X(ST_AsText(n1.the_geom)) AS x, ST_Y(ST_AsText(n1.the_geom)) AS y FROM ".$table_pq." AS p1 , ".$table_node." AS n1, ".$table_pq_type." AS pt WHERE p1.node = n1.id AND p1.id=" . $_GET['pq_id'] . " AND p1.pq_type_id = pt.id;";
     $result = pg_fetch_assoc(pg_query($sql));
     //print_r($result);
     // id узла
     $node_id = $result['id'];
+    // координаты узла
+    $x = $result['x'];
+    $y = $result['y'];
     // тип и номер кросса/муфты
     $pq_type = $result['type'];
     $pq_num = $result['num'];
@@ -2183,6 +2185,7 @@ if (isset($_GET['act']) && ( $_GET['act'] == 's_cable' || $_GET['act'] == 's_por
 		                        // будет всегда выводить кнопки
 		                            $content.='&nbsp;<button class="icon-share-2 m0" id="find_fib_conn_'.$fiber_id.'" title="Отследить ОВ"></button>';
 		                            $content.='<button class="icon-cancel m0" id="f_fiber_clean_'.$fiber_id.'" title="Очистить" style="display:none" ></button>';
+		                            $content.='&nbsp;<button class="icon-earth m0" id="show_fib_map_'.$fiber_id.'" rel="lat='.$y.'&lon='.$x.'" title="Показать на карте"></button>';
 	                        $content.='</td>';
 
 
