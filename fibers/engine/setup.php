@@ -621,7 +621,8 @@
 					n1.id AS addr_1_id,
 					n2.address AS addr_2_name,
 					n2.id AS addr_2_id,
-    				c1.the_geom AS geom
+					c1.the_geom AS geom,
+					ceiling(ST_length(c1.the_geom, true)) AS geom2
 				FROM
 					".$table_cable." AS c1,
 					".$table_pq." AS p1,
@@ -645,6 +646,7 @@
     		if(count($query)>0) {
     			$cable='<div style="float: left;"><b>Кабель: </b>'.$query['cable_name'].'</div><div style="float: fight;"></div><div style="float: right;">{CLOSE}</div><div class="clear"></div>';
     			$cable.='<div style="float: left;"><a href="index.php?act=s_pq&node_id='.$query['addr_1_id'].'" target="_blank">'.$query['addr_1_name'].'</a> - <a href="index.php?act=s_pq&node_id='.$query['addr_2_id'].'" target="_blank">'.$query['addr_2_name'].'</a></div><div class="clear"></div>';
+			$cable.='<div style="float: left;">Расстояние: <b>'.$query['geom2'].'</b> м.</div><div class="clear"></div>';
     		}
     		return $cable;
     	}
