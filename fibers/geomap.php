@@ -39,7 +39,6 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
 	<script type="text/javascript" src="js/jquery.autocomplete.js"></script>
 	<script type="text/javascript" src="js/alertify.min.js"></script>
 	<script type="text/javascript" charset="utf-8" src="js/LoadingPanel.js"> </script>
-	<!-- <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?v=3.9&sensor=false&language=en&libraries=weather,panoramio"></script>-->
 
     <script type="text/javascript">
     	var a=0;
@@ -52,7 +51,6 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
 
         // функция проверки истекла ли сессия
         function check_session(e) {
-            //alert('check');
             $.ajax({
 		        url: 'wms_proxy.php?check_session',
 		        dataType: "html",
@@ -192,11 +190,9 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
 	}
 ?>
             map.addControl(new OpenLayers.Control.Navigation());
-            //map.addControl(new OpenLayers.Control.LayerSwitcher());
             var ls = new OpenLayers.Control.LayerSwitcher({'ascending':false});
             map.addControl(ls);
             map.addControl(new OpenLayers.Control.Permalink());
-            //map.addControl(new OpenLayers.Control.MousePosition());
             map.addControl(new OpenLayers.Control.OverviewMap());
 
 			map.addControls([loadingpanel]);
@@ -339,16 +335,11 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
             map.setCenter(position, zoom);
 <?php if(isset($_GET['marker'])) {
 	$addr=pg_result(pg_query("SELECT address FROM ".$table_node." WHERE the_geom = ST_PointFromText('POINT(".$_GET['lon']." ".$_GET['lat'].")', 4326);"),0);
-	//echo "SELECT address FROM ".$table_node." WHERE the_geom = ST_PointFromText('POINT(".$_GET['lon']." ".$_GET['lat'].")', 4326);";
-	//die;
 			echo '
 	            // маркер
 	            var markers = new OpenLayers.Layer.Markers( "Markers" );
 	            map.addLayer(markers);
-
-	            //var size = new OpenLayers.Size(21,25);
 	            var size = new OpenLayers.Size(42,42);
-	            //var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
 	            var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
 	            var icon = new OpenLayers.Icon("./geomap/marker2.png",size,offset);
 	            var marker = new OpenLayers.Marker(position,icon);
@@ -388,7 +379,6 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
             	var lon = center.lon;
             	var zoom = map.getZoom();
             	var layers = map.getLayersBy("visibility", true);
-            	//history.pushState(1, "", "?lat="+lat+"&lon="+lon+"&zoom="+zoom+"&baselayer="+layers[0].name+find);
             	history.pushState(1, "", "?lat="+lat+"&lon="+lon+"&zoom="+zoom+"&baselayer="+layers[0].name+find+"<?php if(is_numeric($_GET['find_fiber'])) echo "&find_fiber=".clean($_GET['find_fiber']);?>");
             };
 
@@ -403,23 +393,17 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
             	var URL = 'wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&LAYERS=map&QUERY_LAYERS=map&STYLES=&BBOX='+BBOX+'&FEATURE_COUNT=20&HEIGHT='+HEIGHT+'&WIDTH='+WIDTH+'&FORMAT=image%2Fpng&info_format=application%2Fvnd.ogc.gml&SRS=EPSG%3A4326&X='+X+'&Y='+Y;
 
             	URL = escape(URL);
-            	//alert('wms_proxy.php?geocode='+LonLat.lon+','+LonLat.lat);
                 $.ajax({
                     url: "wms_proxy.php?args=" + URL,
                     dataType: "html",
                     type: "GET",
-                    //async: false,
                     success: function(data) {
-    	                //alert(data);
-    	                //return false;
     	                if(data=='reload') {
         	                window.location.reload();
         	                return false;
     	                }
             	        if(data) {
             	        	$(".alertify-logs").html("");
-            	        	//var audio = document.getElementsByTagName("audio")[0];
-							//audio.play();
 							a++;
             	        	popup = new OpenLayers.Popup.FramedCloud(
                                     "chicken", 
@@ -429,16 +413,13 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
                                     null,
                                     false
 							);
-            	        	//popupClear();
             	        	popup.autoSize = true;
             	        	map.addPopup(popup,true);
-                        //if (data.indexOf("<table") != -1) { }
             	        }
             	        else {
             	        	b++;
             	        	$.ajax({
             			        url: 'wms_proxy.php?geocode&lat='+LonLat.lat+'&lon='+LonLat.lon+'&addressdetails=1',
-            			        //url: 'wms_proxy.php?geocode='+LonLat.lon+','+LonLat.lat,
             			        dataType: "html",
             			        type: "GET",
             			        success: function(data) {
@@ -449,14 +430,11 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
             			                        "chicken", 
             			                        xy,
             			                        null,
-            			                        //data + '&nbsp;<input id="close_button" type="button" title="Закрыть" value="X" onClick="javascript: popupClear(); $(\'.alertify-logs\').html(\'\');"></input>',
             			                        data,
             			                        null,
             			                        false
             			                    );
-            				        	//popupClear();
             				        	popup.autoSize = true;
-            				        	//allert(popup);
             				        	map.addPopup(popup,true);
             				        }
             			        }
@@ -474,10 +452,6 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
             });
 
     		map.events.register('click', map, findLayerClick);
-    		/*map.events.register('click', map, function(event) {
-    			findLayerClick();
-            });*/
-
         }
 
         function allert(obj){
