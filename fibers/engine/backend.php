@@ -3673,14 +3673,28 @@ function set_color($table,$id,$type,$color_id) {
     			fib_find($row['to_fiber'],$fiber_id,$node_id,true);
     		}
     	}
-    	$sql="SELECT ST_AsGeoJSON(c1.the_geom) AS the_geom
-				FROM ".$table_fiber." AS f1, ".$table_cable." AS c1
-				WHERE
-					f1.id = ".$fiber_id."
-				AND
-					f1.cable_id = c1.id";
+
+    	$sql="SELECT ST_AsGeoJSON(cc.the_geom) AS the_geom, ST_AsGeoJSON(n1.the_geom) AS the_geom1, ST_AsGeoJSON(n2.the_geom) AS the_geom2
+				FROM (SELECT
+						f1.id, c1.pq_1, c1.pq_2, c1.the_geom AS the_geom
+					FROM ".$table_fiber." AS f1, ".$table_cable." AS c1
+					WHERE
+						f1.id = ".$fiber_id."
+					AND
+						f1.cable_id = c1.id) AS cc
+				LEFT JOIN ".$table_cruz_conn." AS cc1 ON cc1.fiber_id = cc.id AND cc1.pq_id = cc.pq_1
+					LEFT JOIN ".$table_pq." AS p1 ON p1.id = cc1.pq_id
+						LEFT JOIN ".$table_node." AS n1 ON n1.id = p1.node
+				
+				LEFT JOIN ".$table_cruz_conn." AS cc2 ON cc2.fiber_id = cc.id AND cc2.pq_id = cc.pq_2
+					LEFT JOIN ".$table_pq." AS p2 ON p2.id = cc2.pq_id
+						LEFT JOIN ".$table_node." AS n2 ON n2.id = p2.node";
+
     	$result=pg_fetch_assoc(pg_query($sql));
     	$array_line[] = $result['the_geom'];
+
+    	if(isset($result['the_geom1'])) $array_point[] = $result['the_geom1'];
+    	if(isset($result['the_geom2'])) $array_point[] = $result['the_geom2'];
 
     	$array_line = array_unique($array_line);
     	$array_point = array_unique($array_point);
