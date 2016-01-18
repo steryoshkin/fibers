@@ -5,10 +5,7 @@ if (isset($_GET['noactive'])) {
 	echo 'Учетная запись не активна...';
 	die;
 }
-if($_SERVER['HTTP_HOST']=='map.rdtc.ru') {
-	header("Location: http://pto.rdtc.ru/fibers/geomap.php");
-	die;
-}
+
 header("Location: /fibers");
 
 ////////////////////
