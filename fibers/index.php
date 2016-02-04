@@ -56,6 +56,7 @@ function show_menu() {
                             <li><a href="?act=dirs&dir=mc_type">Типы медиаконвертеров</a></li>
                         </ul>
                     </li>
+            		<li><a href="?act=dirs&dir=node_type">Типы узлов</a></li>
                     <li class="sub-menu"><a href="#">Прочее оборудование</a>
                         <ul class="text-left">
                             <li><a href="?act=dirs&dir=box_type">Рамы/Ящики</a></li>
@@ -169,10 +170,10 @@ if (isset($_GET['act']) && $_GET['act'] == 's_node' && $group_access['node']) {
     if (pg_num_rows($result)) {
         while ($row = pg_fetch_assoc($result)) {
         	$find_node_get=(@isset($_GET['find_node'])?$_GET['find_node']:"");
-            $find_abc .= '<div class="b_m">'.($row['name'].'*'==$find_node_get?'<div class="b_m">'.$row['name'].'</div>':'<a class="b_m_a" href="?act=s_node&find_node='.$row['name'].'*'.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').'">'.$row['name'].'</a>').'</div>';
+            $find_abc .= '<div class="b_m">'.($row['name'].'*'==$find_node_get?'<div class="b_m">'.$row['name'].'</div>':'<a class="b_m_a" href="?act=s_node&find_node='.$row['name'].'*'.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'">'.$row['name'].'</a>').'</div>';
         	//$find_abc .= '<div class="b_m"><a class="b_m_a" href="?act=s_node&find_node='.$row['name'].'%'.(is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').'">'.$row['name'].'</a></div>';
         }
-        $find_abc .= '<div class="b_m"><a class="b_m_a" href="?act=s_node'.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').'">Все</a></div>';
+        $find_abc .= '<div class="b_m"><a class="b_m_a" href="?act=s_node'.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'">Все</a></div>';
     }
     $i = 1;
     //$link = '<div class="title">Узлы</div>';
@@ -181,14 +182,14 @@ if (isset($_GET['act']) && $_GET['act'] == 's_node' && $group_access['node']) {
     if ($group_access['node_add'])
     	$action.='<div class="span2 m0 text-left"><button class="m0" id="in_div" rel="?act=n_node" />Добавить узел</button></div>';
         //$action.='<div class="span2 m0 text-left"><button class="m0" id="node_add_div" rel="?act=n_node" />Добавить узел</button></div>';
-    $action.='<div class="span3 m0 text-left input-control text"><input class="" id="find_node" type="text" onchange="javascript: window.location=\'?act=s_node&find_node=*\'+$(\'input#find_node\').val()+\'*'.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').'\';" placeholder="Введите для поиска" /></div>';
-    $action.='<div class="span1 m0 text-left toolbar"><button class="icon-search m0" onClick="javascript: window.location=\'?act=s_node&find_node=*\'+$(\'input#find_node\').val()+\'*'.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').'\';" /></button></div>';
+    $action.='<div class="span3 m0 text-left input-control text"><input class="" id="find_node" type="text" onchange="javascript: window.location=\'?act=s_node&find_node=*\'+$(\'input#find_node\').val()+\'*'.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'\';" placeholder="Введите для поиска" /></div>';
+    $action.='<div class="span1 m0 text-left toolbar"><button class="icon-search m0" onClick="javascript: window.location=\'?act=s_node&find_node=*\'+$(\'input#find_node\').val()+\'*'.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'\';" /></button></div>';
     
     $sql="SELECT * FROM ".$table_area." ORDER BY id,name";
     $result = pg_query($sql);
     if(pg_num_rows($result)){
     	//$select_area='<select id="select_area" onchange="if($(\'select#select_area\').val()) var area_id=\'&area_id=\'+$(\'select#select_area\').val(); window.location=\'?act=s_node'.(isset($_GET['find_node'])?'&find_node='.clean(($_GET['find_node'])):'').(isnumeric($_GET['page'])?'&page='.clean(($_GET['page'])):'').'+area_id;">';
-    	$select_area='<select id="select_area" onChange="var area_id=\'\'; if($(\'select#select_area\').val()) area_id=\'&area_id=\'+$(\'select#select_area\').val(); window.location=\'?act=s_node'.(isset($_GET['find_node'])?'&find_node='.clean($_GET['find_node']):'').(@is_numeric($_GET['page'])?'&page='.clean($_GET['page']):'').'\'+area_id;">';
+    	$select_area='<select id="select_area" onChange="var area_id=\'\'; if($(\'select#select_area\').val()) area_id=\'&area_id=\'+$(\'select#select_area\').val(); window.location=\'?act=s_node'.(isset($_GET['find_node'])?'&find_node='.clean($_GET['find_node']):'').(@is_numeric($_GET['page'])?'&page='.clean($_GET['page']):'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'\'+area_id;">';
     	$select_area.='<option value="">Все районы</option>';
     	while($row=pg_fetch_assoc($result)){
     		$select_area.='<option value="'.$row['id'].'"';
@@ -200,6 +201,23 @@ if (isset($_GET['act']) && $_GET['act'] == 's_node' && $group_access['node']) {
     	$select_area.='</select>';
     }
     $action.='<div class="span3 m0 input-control text">'.$select_area.'</div>';
+    
+    // фильтр по типам узлов
+    $sql="SELECT * FROM ".$table_node_type." ORDER BY id,name";
+    $result = pg_query($sql);
+    if(pg_num_rows($result)){
+    	$select_node_type='<select id="select_node_type" onChange="var node_type_id=\'\'; if($(\'select#select_node_type\').val()) node_type_id=\'&node_type_id=\'+$(\'select#select_node_type\').val(); window.location=\'?act=s_node'.(isset($_GET['find_node'])?'&find_node='.clean($_GET['find_node']):'').(@is_numeric($_GET['page'])?'&page='.clean($_GET['page']):'').(isset($_GET['area_id'])?'&area_id='.clean($_GET['area_id']):'').'\'+node_type_id;">';
+    	$select_node_type.='<option value="">Все типы узлов</option>';
+    	while($row=pg_fetch_assoc($result)){
+    		$select_node_type.='<option value="'.$row['id'].'"';
+    		if(@$_GET['node_type_id']==$row['id']) {
+    			$select_node_type.=" SELECTED";
+    		}
+    		$select_node_type.='>'.$row['name'].'</option>';
+    	}
+    	$select_node_type.='</select>';
+    }
+    $action.='<div class="span2 m0 input-control text">'.$select_node_type.'</div>';
 
     $find_node='';
     if (isset($_GET['find_node'])) {
@@ -208,7 +226,7 @@ if (isset($_GET['act']) && $_GET['act'] == 's_node' && $group_access['node']) {
     	$find_node = "AND lower(n1.address_full) LIKE lower('".str_replace(" ", "%", str_replace("*", "%", clean($_GET['find_node'])))."')";
     }
     
-    $sql_count = "SELECT COUNT(*) FROM ".$table_node." AS n1, ".$table_street_name." AS s_name WHERE n1.street_id = s_name.id " . $find_node.(@is_numeric($_GET['area_id'])?" AND s_name.area_id = ".$_GET['area_id']:"");
+    $sql_count = "SELECT COUNT(*) FROM ".$table_node." AS n1, ".$table_street_name." AS s_name WHERE n1.street_id = s_name.id " . $find_node.(@is_numeric($_GET['area_id'])?" AND s_name.area_id = ".$_GET['area_id']:"").(@is_numeric($_GET['node_type_id'])?" AND n1.node_type_id = ".$_GET['node_type_id']:"");
     $total_rows=pg_fetch_row(pg_query($sql_count));
 
     //$sql_count_map = "SELECT COUNT(*) FROM ".$table_node." AS n1, ".$table_street_name." AS s_name WHERE n1.street_id = s_name.id AND n1.the_geom IS NULL " . $find_node;
@@ -227,7 +245,7 @@ if (isset($_GET['act']) && $_GET['act'] == 's_node' && $group_access['node']) {
         if ($a-1 == $page) {
             $pages.='<div class="b_m">'.$a.'</div>';
         } else {
-            $pages.='<div class="b_m"><a class="b_m_a" href="?act=s_node'.$find.'&page='.$a.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').'">'.$a.'</a></div>';
+            $pages.='<div class="b_m"><a class="b_m_a" href="?act=s_node'.$find.'&page='.$a.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'">'.$a.'</a></div>';
         }
     }
     $pages='<div class="text-center">
@@ -269,7 +287,8 @@ if (isset($_GET['act']) && $_GET['act'] == 's_node' && $group_access['node']) {
 		AND
 			n1.street_num_id = s_num.id
 		".$find_node.
-		(@is_numeric($_GET['area_id'])?" AND s_name.area_id = ".$_GET['area_id']:"")."
+		(@is_numeric($_GET['area_id'])?" AND s_name.area_id = ".$_GET['area_id']:"").
+		(@is_numeric($_GET['node_type_id'])?" AND n1.node_type_id = ".$_GET['node_type_id']:"")."
 		GROUP BY
 			".(@is_numeric($_GET['area_id'])?"s_name.area_id, ":"")."street_name, street_num, location, n1.id, room, key_num
 		ORDER BY s_name.name, LENGTH(s_num.num), s_num.num, LENGTH(loc.location)
@@ -1494,6 +1513,42 @@ if (isset($_GET['act']) && $_GET['act'] == 'dirs' && ($group_access['dirs'] || $
             }
             $content.='</table>';
         }
+    }
+
+// редактирование типов узлов
+    if($_GET['dir'] == 'node_type' && $group_access['dirs']) {
+    	$i=1;
+    	$title.= ' > Типы узлов';
+    	$action.='
+        <div class="span2 m5 input-control text">Типы узлов</div>
+        <div class="span m0 text-left">
+            <button class="m0" id="in_div" rel="?act=n_node_type" type="button" />Добавить тип узла</button>
+        </div>';
+    	$sql = "SELECT * FROM ".$table_node_type." ORDER BY name";
+    	$result = pg_query($sql);
+    	if (pg_num_rows($result)) {
+    		$content='<table class="striped">';
+    		$content.='<tr>';
+    		$content.='<td class="span1">№</td>';
+    		$content.='<td class="span4">Название</td>';
+    		$content.='<td class="span7">Описание</td>';
+    		$content.='<td class="span2">&nbsp;</td>';
+    		$content.='</tr>';
+    		$content.='<tr>';
+    		while ($row = pg_fetch_assoc($result)) {
+    			$content.='<td>'.$i.'</td>';
+    			$content.='<td>'.$row['name'].'</td>';
+    			$content.='<td>'.$row['descrip'].'&nbsp;</td>';
+    			$content.='
+                <td class="toolbar m0">
+                    <button class="icon-pencil m0 mini" id="node_type_edit_in_div" rel="?act=e_node_type&id='.$row['id'].'" title="Редактировать"></button>
+                    <button class="icon-cancel-2 m0 mini" id="node_type_del_in_div" rel="?act=d_node_type&id='.$row['id'].'" title="Удалить"></button>
+                </td>';
+    			$content.='</tr>';
+    			$i++;
+    		}
+    		$content.='</table>';
+    	}
     }
 
 // редактирование типов рам/ящиков

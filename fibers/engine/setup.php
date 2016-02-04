@@ -46,6 +46,7 @@
     $table_switch_type='fibers.switch_type';
     $table_mc='fibers.mc';
     $table_mc_type='fibers.mc_type';
+    $table_node_type='fibers.node_type';
     $table_box='fibers.box';
     $table_box_type='fibers.box_type';
     $table_ups='fibers.ups';

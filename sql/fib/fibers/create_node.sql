@@ -21,6 +21,7 @@ CREATE TABLE fibers.node
   is_new boolean NOT NULL DEFAULT true,
   u_const boolean DEFAULT true,
   date timestamp without time zone,
+  node_type_id integer,
   CONSTRAINT node_pkey PRIMARY KEY (id)
 )
 WITH (

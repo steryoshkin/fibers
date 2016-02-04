@@ -608,6 +608,11 @@ $(document).ready(
                  alert('Введите номер дома');
                  $('input#street_num').focus();
                  return false;
+             } else
+             if($('select#node_type').val() == 0) {
+                 alert('Выберите тип узла');
+                 $('select#node_type').focus();
+                 return false;
              }
              var id = $("select#id").val(); 
              if(!id) id=0;
@@ -628,6 +633,7 @@ $(document).ready(
                      location_id: $('select#location').val(),
                      room_id: $('select#room').val(),
                      incorrect: $('#incorrect').attr('checked'),
+                     node_type_id: $('select#node_type').val(),
                      descrip: $('input#descrip').val(),
                  }, function (reply) {
                 	 if(reply)
@@ -774,6 +780,43 @@ $(document).ready(
                  return false;
              });
 // типы медиаконвертеров end -------------------------------------------------------------------------------------------------------
+
+// типы узлов begin -------------------------------------------------------------------------------------------------------
+             // изменение, внесение нового типа узлов в div
+                          $("button#n_node_type,#e_node_type").live('click', function(event) {
+                              if($('input#name').val()==0) {
+                                  alert('Введите название');
+                                  $('input#name').focus();
+                                  return false;
+                              }
+                              var id = $("input#id").val(); 
+                              if(!id) id=0;
+                              $.post("./engine/backend.php", {
+                                  act: $(this).attr('id'),
+                                  id: id,
+                                  name: $('input#name').val(),
+                                  descrip: $('input#descrip').val(),
+                              }, function (reply) {
+                             	 if(reply)
+                                      alert(reply);
+                                  else
+                                      window.location.reload();
+                              return false;
+                              });
+                          });
+             // удаление типа узлов
+                          $("button#d_node_type").live('click', function(event) {
+                              $.post("./engine/backend.php", {
+                                  act: 'd_node_type',
+                                  id: $(this).attr("rel"),
+                              }, function (reply) {
+                             	 if(reply)
+                             		 alert(reply);
+                                  window.location.reload();
+                              });
+                              return false;
+                          });
+// типы узлов end -------------------------------------------------------------------------------------------------------
 
 // медиаконвертеры begin -------------------------------------------------------------------------------------------------------
 // изменение, внесение нового медиаконвертера в div

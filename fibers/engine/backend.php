@@ -1232,6 +1232,7 @@ function set_color($table,$id,$type,$color_id) {
     		$room_id=$result['room_id'];
     		$descrip=$result['descrip'];
     		$incorrect=$result['incorrect'];
+    		$node_type_id=$result['node_type_id'];
 
     		$select_node='<select id="id">';
 			$select_node.='<option value="'.clean($_GET['node_id']).'" SELECTED">'.$node_id.'</option>';
@@ -1313,6 +1314,22 @@ function set_color($table,$id,$type,$color_id) {
     		}
     		$select_room.='</select>';
     	}
+    	// тип узла
+    	$sql="SELECT * FROM ".$table_node_type." ORDER BY name";
+    	$result = pg_query($sql);
+    	if(pg_num_rows($result)){
+    		$select_node_type='<select id="node_type">';
+    		$select_node_type.='<option value="0">-Тип узла-</option>';
+    		while($row=pg_fetch_assoc($result)){
+    			$select_node_type.='<option value="'.$row['id'].'"';
+    			if(@$node_type_id==$row['id']) {
+    				$select_node_type.=" SELECTED";
+    			}
+    			$select_node_type.='>'.$row['name'].'</option>';
+    		}
+    		$select_node_type.='</select>';
+    	}
+
     	$text='<input type="hidden" id="act" value="'.clean($_GET['act']).'" />';
 
     	//$text.='<input type="hidden" id="id" value="'.$node_id.'" />';
@@ -1326,6 +1343,7 @@ function set_color($table,$id,$type,$color_id) {
 	    	$text.='<div class="span1 m0 input-control text"><input class="mini" type="text" id="num_ent" value="'.@$num_ent.'" placeholder="№ подъезда" /></div>';
 	    	$text.='<div class="span1 span1_5 m0 input-control text">'.$select_location.'</div>';
 	    	$text.='<div class="span1 span1_5 m0 input-control text">'.$select_room.'</div>';
+	    	$text.='<div class="span1 span2 m0 input-control text">'.$select_node_type.'</div>';
 
 	    	$text.='<div class="span8 m0 input-control text"><input class="mini" type="text" id="descrip" value="'.@$descrip.'" placeholder="Введите описание" /></div>';
 	    	$text.='<div class="span2 m5"><label class="checkbox"><input type="checkbox" id="incorrect" '.(@$incorrect==true?'checked':'').'><span>Проблемма</span></label></div>';
@@ -1354,7 +1372,8 @@ function set_color($table,$id,$type,$color_id) {
             AND n.num_ent '.(empty($_POST['num_ent'])?"IS NULL":"=".$_POST['num_ent']).'
             AND n.location_id '.($_POST['location_id']!=0?"=".$_POST['location_id']:"IS NULL").'
             AND n.room_id '.($_POST['room_id']!=0?"=".$_POST['room_id']:"IS NULL").'
-            AND n.incorrect '.(empty($_POST['incorrect'])?"IS NULL":"=true");
+            AND n.incorrect '.(empty($_POST['incorrect'])?"IS NULL":"=true").'
+            AND n.node_type_id '.($_POST['node_type_id']!=0?"=".$_POST['node_type_id']:"IS NULL");
 
             if(@pg_result(pg_query($sql.' AND n.descrip '.(empty($_POST['descrip'])?"IS NULL":"='".$_POST['descrip']."'")),0)) {
                 $text="Изменить невозможно, аналогичное помещение существует!!!";
@@ -1367,6 +1386,7 @@ function set_color($table,$id,$type,$color_id) {
                     location_id = ".($_POST['location_id']!=0?$_POST['location_id']:"NULL").",
                     room_id = ".($_POST['room_id']!=0?$_POST['room_id']:"NULL").",
                     incorrect=".(empty($_POST['incorrect'])?"NULL":"true").",
+                    node_type_id = ".($_POST['node_type_id']!=0?$_POST['node_type_id']:"NULL").",
                     descrip= ".(empty($_POST['descrip'])?"NULL":"'".$_POST['descrip']."'").",
 					user_id = ".$user_id.",
 					".($_POST['act']=='n_node'?'type = 0,':'')."
@@ -1745,6 +1765,97 @@ function set_color($table,$id,$type,$color_id) {
     }
     
 // типы медиаконвертеров end -------------------------------------------------------------------------------------------------------
+
+// типы узлов begin -------------------------------------------------------------------------------------------------------
+    // ввод нового/редактирование типа узла в div
+    if(isset($_GET['act']) && ($_GET['act']=='n_node_type' || $_GET['act']=='e_node_type') ) {
+    	if($_GET['act']=='e_node_type')
+    	{
+    		$id=clean($_GET['id']);
+    		$sql="SELECT * FROM " . $table_node_type . " WHERE id = ".$id;
+    		$result=pg_fetch_assoc(pg_query($sql));
+    		$name=$result['name'];
+    		$descrip=$result['descrip'];
+    	}
+    	$text='<input type="hidden" id="id" value="'.$id.'">';
+    	$text.='<div class="span3 m0 input-control text"><input type="text" id="name" value="'.$name.'" placeholder="Название" /></div>';
+    	$text.='<div class="span6 m0 input-control text"><input type="text" id="descrip" value="'.$descrip.'" placeholder="Описание" /></div>';
+    	$text.='<div class="span2 toolbar m0">
+            <button class="icon-checkmark m0" id="'.clean($_GET['act']).'" title="Ok"></button>
+            <button class="icon-blocked m0" id="exit" title="Отмена"></button>
+        </div>';
+    	echo $text;
+    	die;
+    }
+
+    // ввод нового/редактирование типа узла в div post
+    if(isset($_POST['act']) && @is_numeric($_POST['id']) && isset($_POST['name']) && ($_POST['act']=='n_node_type' || $_POST['act']=='e_node_type') ) {
+    	$descrip_sql=(empty($_POST['descrip'])?'NULL':"'".clean($_POST['descrip'])."'");
+    	$sql="SELECT * FROM ".$table_node_type." WHERE name='".clean($_POST['name'])."'";
+    	if($_POST['act']=='n_node_type') {
+    		if(@pg_result(pg_query($sql),0)) {
+    			$text="Создать невозможно, такой тип узла существует!!!";
+    		} else {
+    			pg_query("INSERT INTO ".$table_node_type." (name,descrip,user_id) VALUES ('".clean($_POST['name'])."', ".$descrip_sql.",".$user_id.")");
+    			die;
+    		}
+    	} elseif($_POST['act']=='e_node_type') {
+    		if(@pg_result(pg_query($sql.' AND descrip = '.$descrip_sql),0)) {
+    			$text="Изменить невозможно, аналогичный тип узла существует!!!";
+    		} else {
+    			$data_old=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_node_type." WHERE id = ".clean($_POST['id']) ));
+    
+    			pg_query("UPDATE ".$table_node_type." SET name='".clean($_POST['name'])."', descrip=".$descrip_sql.", user_id=".$user_id." WHERE id=".clean($_POST['id']).";");
+    
+    			$data_new=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_node_type." WHERE id = ".clean($_POST['id']) ));
+    
+    			$result = serialize(array_diff($data_old, $data_new));
+    			add_log($table_node_type,clean($_POST['id']),$result,$user_id);
+    			die;
+    		}
+    	}
+    	echo $text;
+    	die;
+    }
+    
+    // удаление типа медиаконвертера div
+    if(isset($_GET['act']) && $_GET['act']=='d_node_type' && @is_numeric($_GET['id'])) {
+    	$sql="SELECT COUNT(*) FROM ".$table_node." AS n1 WHERE n1.type2=".clean($_GET['id']);
+    	$name=pg_result(pg_query("SELECT name FROM ".$table_node_type." AS n1 WHERE n1.id =".clean($_GET['id'])),0);
+    	if(pg_result(pg_query($sql),0)) {
+    		$text='
+            <div class="span11 m5">&nbsp;Тип узла "'.$name.'" используется. Удалить нельзя!!!</div>
+            <div class="span1 toolbar m0">
+            <button class="icon-blocked m0" id="exit" title="Отмена"></button>
+            </div>';
+    	} else {
+    		$text='
+            <div class="span10 m5">&nbsp;Удалить тип узла "'.$name.'"?</div>
+            <div class="span2 toolbar m0">
+                <button class="icon-checkmark m0" id="d_node_type" rel="'.clean($_GET['id']).'" title="Ok"></button>
+                <button class="icon-blocked m0" id="exit" title="Отмена"></button>
+            </div>';
+    	}
+    	echo $text;
+    	die;
+    }
+    
+    // удаление типа узла sql
+    if(isset($_POST['act']) && $_POST['act']=='d_node_type' && @is_numeric($_POST['id']) ) {
+    	if(!@pg_result(pg_query("SELECT COUNT(*) FROM ".$table_node." AS n1 WHERE n1.type2 = ".clean($_POST['id']).""),0)) {
+    		$data_old=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_node_type." WHERE id = ".clean($_POST['id']) ));
+    		$result = serialize($data_old);
+    		add_log($table_node_type,clean($_POST['id']),$result,$user_id);
+    
+    		// удаляем тип узла
+    		pg_query("DELETE FROM ".$table_node_type." WHERE id = ".clean($_POST['id']));
+    		die;
+    	}
+    	echo "not exist";
+    	die;
+    }
+    
+// типы узлов end -------------------------------------------------------------------------------------------------------
 
 // медиаконвертеры begin -------------------------------------------------------------------------------------------------------
 // ввод нового/редактирование медиакорветрета в div
