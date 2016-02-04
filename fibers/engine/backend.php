@@ -1818,9 +1818,9 @@ function set_color($table,$id,$type,$color_id) {
     	die;
     }
     
-    // удаление типа медиаконвертера div
+    // удаление типа узла div
     if(isset($_GET['act']) && $_GET['act']=='d_node_type' && @is_numeric($_GET['id'])) {
-    	$sql="SELECT COUNT(*) FROM ".$table_node." AS n1 WHERE n1.type2=".clean($_GET['id']);
+    	$sql="SELECT COUNT(*) FROM ".$table_node." AS n1 WHERE n1.node_type_id=".clean($_GET['id']);
     	$name=pg_result(pg_query("SELECT name FROM ".$table_node_type." AS n1 WHERE n1.id =".clean($_GET['id'])),0);
     	if(pg_result(pg_query($sql),0)) {
     		$text='

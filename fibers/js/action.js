@@ -608,12 +608,12 @@ $(document).ready(
                  alert('Введите номер дома');
                  $('input#street_num').focus();
                  return false;
-             } else
+             }/* else
              if($('select#node_type').val() == 0) {
                  alert('Выберите тип узла');
                  $('select#node_type').focus();
                  return false;
-             }
+             }*/
              var id = $("select#id").val(); 
              if(!id) id=0;
              $.post("./engine/backend.php", {
