@@ -4,7 +4,7 @@
 
 CREATE TABLE fibers.street_num
 (
-  id integer NOT NULL DEFAULT nextval('fibers.street_num_id_seq'::regclass),
+  id serial NOT NULL,
   street_name_id integer,
   num character varying(255),
   descrip character varying(255),

@@ -4,7 +4,7 @@
 
 CREATE TABLE fibers.room
 (
-  id integer NOT NULL DEFAULT nextval('fibers.room_id_seq'::regclass),
+  id serial NOT NULL,
   room character varying(255),
   descrip character varying(255),
   user_id integer,

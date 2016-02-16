@@ -4,7 +4,7 @@
 
 CREATE TABLE fibers.switches
 (
-  id integer NOT NULL DEFAULT nextval('fibers.switches_id_seq'::regclass),
+  id serial NOT NULL,
   node_id integer,
   switch_type_id integer,
   used_ports integer,

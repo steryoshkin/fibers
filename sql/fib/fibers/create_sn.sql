@@ -4,7 +4,7 @@
 
 CREATE TABLE fibers.sn
 (
-  id integer NOT NULL DEFAULT nextval('fibers.sn_id_seq'::regclass),
+  id serial NOT NULL,
   sn character varying(50),
   eq integer,
   eq_type character varying(255),

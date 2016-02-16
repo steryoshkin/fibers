@@ -4,7 +4,7 @@
 
 CREATE TABLE fibers.keys
 (
-  id integer NOT NULL DEFAULT nextval('fibers.keys_id_seq'::regclass),
+  id serial NOT NULL,
   num character varying(255),
   node_id integer,
   descrip character varying(255),

@@ -17,13 +17,3 @@ WITH (
 );
 ALTER TABLE fibers.cable_reserve
   OWNER TO opengeo;
-
--- Index: fibers.spatial_cable_reserve_the_geom
-
--- DROP INDEX fibers.spatial_cable_reserve_the_geom;
-
-CREATE INDEX spatial_cable_reserve_the_geom
-  ON fibers.cable_reserve
-  USING gist
-  (the_geom);
-

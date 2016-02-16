@@ -4,7 +4,7 @@
 
 CREATE TABLE fibers.color
 (
-  id integer NOT NULL DEFAULT nextval('fibers.color_id_seq'::regclass),
+  id serial NOT NULL,
   type integer NOT NULL,
   name character varying(100) NOT NULL,
   color character varying(6) NOT NULL,

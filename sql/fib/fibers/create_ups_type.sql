@@ -4,7 +4,7 @@
 
 CREATE TABLE fibers.ups_type
 (
-  id integer NOT NULL DEFAULT nextval('fibers.ups_type_id_seq'::regclass),
+  id serial NOT NULL,
   name character varying(255),
   unit integer,
   power numeric(10,2),

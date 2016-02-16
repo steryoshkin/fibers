@@ -4,7 +4,7 @@
 
 CREATE TABLE fibers.descrip
 (
-  id integer NOT NULL DEFAULT nextval('fibers.descrip_id_seq'::regclass),
+  id serial NOT NULL,
   text text,
   node_id integer,
   descrip character varying(255),

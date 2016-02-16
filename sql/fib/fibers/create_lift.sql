@@ -4,7 +4,7 @@
 
 CREATE TABLE fibers.lift
 (
-  id integer NOT NULL DEFAULT nextval('fibers.lift_id_seq'::regclass),
+  id serial NOT NULL,
   node_id integer,
   lift_id integer,
   descrip character varying(255),

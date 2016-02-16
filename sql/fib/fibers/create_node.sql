@@ -4,7 +4,7 @@
 
 CREATE TABLE fibers.node
 (
-  id integer NOT NULL DEFAULT nextval('fibers.node_id_seq'::regclass),
+  id serial NOT NULL,
   address character varying(255),
   address_full character varying(255),
   incorrect boolean,
@@ -31,6 +31,26 @@ WITH (
 ALTER TABLE fibers.node
   OWNER TO opengeo;
 
+-- Function: fibers.node_set_default_trigger_function()
+
+-- DROP FUNCTION fibers.node_set_default_trigger_function();
+
+CREATE OR REPLACE FUNCTION fibers.node_set_default_trigger_function()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+  IF (NEW.is_new IS NULL OR NEW.is_new = FALSE) AND (NEW.u_const IS NULL OR NEW.u_const = FALSE) THEN
+    NEW.is_new := TRUE;
+    NEW.u_const := TRUE;
+    NEW.date := ('now'::text)::timestamp;
+  END IF;
+  RETURN NEW;
+END$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION fibers.node_set_default_trigger_function()
+  OWNER TO opengeo;
+
 -- Trigger: node_set_default_trigger on fibers.node
 
 -- DROP TRIGGER node_set_default_trigger ON fibers.node;
@@ -41,6 +61,24 @@ CREATE TRIGGER node_set_default_trigger
   FOR EACH ROW
   EXECUTE PROCEDURE fibers.node_set_default_trigger_function();
 
+-- Function: fibers.node_update_trigger_function()
+
+-- DROP FUNCTION fibers.node_update_trigger_function();
+
+CREATE OR REPLACE FUNCTION fibers.node_update_trigger_function()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+  IF NEW.type = 1 AND NEW.u_const = TRUE THEN
+    NEW.u_const := NULL;
+  END IF;
+  RETURN NEW;
+END$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION fibers.node_update_trigger_function()
+  OWNER TO opengeo;
+
 -- Trigger: node_update_trigger on fibers.node
 
 -- DROP TRIGGER node_update_trigger ON fibers.node;
@@ -50,4 +88,3 @@ CREATE TRIGGER node_update_trigger
   ON fibers.node
   FOR EACH ROW
   EXECUTE PROCEDURE fibers.node_update_trigger_function();
-

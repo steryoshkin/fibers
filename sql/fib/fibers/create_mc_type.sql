@@ -4,7 +4,7 @@
 
 CREATE TABLE fibers.mc_type
 (
-  id integer NOT NULL DEFAULT nextval('fibers.mc_type_id_seq'::regclass),
+  id serial NOT NULL,
   name character varying(255),
   power numeric(10,2),
   descrip character varying(255),

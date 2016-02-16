@@ -1,1 +1,1 @@
-/var/www/db.php
+db.php_init

@@ -4,7 +4,7 @@
 
 CREATE TABLE fibers.box_type
 (
-  id integer NOT NULL DEFAULT nextval('fibers.box_type_id_seq'::regclass),
+  id serial NOT NULL,
   name character varying(255),
   unit integer,
   descrip character varying(255),

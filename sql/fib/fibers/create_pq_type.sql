@@ -4,7 +4,7 @@
 
 CREATE TABLE fibers.pq_type
 (
-  id integer NOT NULL DEFAULT nextval('fibers.pq_type_id_seq'::regclass),
+  id serial NOT NULL,
   name character varying(255),
   type integer,
   ports_num integer,

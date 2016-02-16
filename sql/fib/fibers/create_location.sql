@@ -4,7 +4,7 @@
 
 CREATE TABLE fibers.location
 (
-  id integer NOT NULL DEFAULT nextval('fibers.location_id_seq'::regclass),
+  id serial NOT NULL,
   location character varying(255),
   descrip character varying(255),
   user_id integer,
