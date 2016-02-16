@@ -1,6 +1,6 @@
 var ready = true;
 
-var host = '62.231.168.109';
+var host = '172.17.2.249';
 
 var scrollFloat = function() {
     'use strict';

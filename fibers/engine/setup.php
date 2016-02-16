@@ -2,8 +2,8 @@
 	@header('Content-Type: text/html; charset=utf-8');
 	include_once ('class/xml2array.php');
 	
-	$host='62.231.168.109';
-	$addr_obl='Сургутский район';
+	$host=$_SERVER['SERVER_ADDR'];
+	$addr_obl='Кемеровская область';
 
 	session_start();
 	

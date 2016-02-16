@@ -8,8 +8,8 @@
 if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_page && empty($_GET['ref'])) {
     header("Location: ".$login_page.'&ref='.base64_encode($_SERVER["REQUEST_URI"]) );
 }	
-	$lon=(@$_GET['lon']?$_GET['lon']:'73.43708');
-	$lat=(@$_GET['lat']?$_GET['lat']:'61.257358');
+	$lon=(@$_GET['lon']?$_GET['lon']:'87.13582992553711');
+	$lat=(@$_GET['lat']?$_GET['lat']:'53.75581576607255');
 	$osm_map_name="OpenStreetMap";
 	$google_sat_map_name="Google Sat";
 	$gis_map_name="2Гис";

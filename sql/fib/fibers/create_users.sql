@@ -25,3 +25,7 @@ ALTER TABLE fibers.users
   OWNER TO opengeo;
 REVOKE ALL ON TABLE fibers.users FROM public;
 REVOKE ALL ON TABLE fibers.users FROM opengeo;
+
+INSERT INTO fibers.users(
+            login, password, name, status, "group", new_pass)
+    VALUES ('admin', MD5('admin'), 'Admin', TRUE, 0, TRUE);
