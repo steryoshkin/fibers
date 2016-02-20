@@ -9,7 +9,7 @@ Ubuntu Server
 ставим
 
     apt-get install openssh-server
-    apt-get install apache2 git curl php5-curl
+    apt-get install apache2 php5 curl php5-curl git
     php5enmod curl
     wget -qO- https://apt.boundlessgeo.com/gpg.key | apt-key add -
     echo "deb https://apt.boundlessgeo.com/suite/latest/ubuntu/ trusty main" > /etc/apt/sources.list.d/opengeo.list
