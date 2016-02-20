@@ -8,75 +8,63 @@ Ubuntu Server
 
 ставим
 
-apt-get install openssh-server
-
-apt-get install apache2 git curl php5-curl
-
-
-wget -qO- https://apt.boundlessgeo.com/gpg.key | apt-key add -
-
-echo "deb https://apt.boundlessgeo.com/suite/latest/ubuntu/ trusty main" > /etc/apt/sources.list.d/opengeo.list
-
-apt-get update
-
-
-apt-get install opengeo-server
-
-
-apt-get install php5-pgsql
-
-
-mv /var/www/html /var/www/html_old
-
-git clone https://github.com/steryoshkin/fibers /var/www/html
-
-cd /var/www/html
-
-chown -R www-data. *
+    apt-get install openssh-server
+    apt-get install apache2 git curl php5-curl
+    wget -qO- https://apt.boundlessgeo.com/gpg.key | apt-key add -
+    echo "deb https://apt.boundlessgeo.com/suite/latest/ubuntu/ trusty main" > /etc/apt/sources.list.d/opengeo.list
+    apt-get update
+    apt-get install opengeo-server
+    apt-get install php5-pgsql
+    mv /var/www/html /var/www/html_old
+    git clone https://github.com/steryoshkin/fibers /var/www/html
+    cd /var/www/html
+    chown -R www-data. *
 
 
 добавить в /etc/postgresql/9.3/main/pg_hba.conf
 
-host    all             postgres        127.0.0.1/32            trust
-host    all             opengeo         127.0.0.1/32            trust
-host    all             all             внешний_ip/32         password
+    host    all             postgres        127.0.0.1/32            trust
+    host    all             opengeo         127.0.0.1/32            trust
+    host    all             all             внешний_ip/32         password
 
 редактировать /etc/postgresql/9.3/main/postgresql.conf
 
-listen_addresses = '*'
+    listen_addresses = '*'
 
 редактировать /etc/php5/apache2/php.ini
 
-short_open_tag = On
+    short_open_tag = On
 
 Создаём базу
 
-sudo -u postgres psql < create_fib.sql
-sudo -u postgres psql < create_user.sql
-
-sudo -u postgres psql -d fib -с "CREATE EXTENSION postgis;"
-
-sudo -u postgres psql -d fib < sql/fib/create_fibers.sql
+    sudo -u postgres psql < create_user.sql
+    sudo -u postgres psql < create_fib.sql
+    sudo -u postgres psql -d fib -с "CREATE EXTENSION postgis;"
+    sudo -u postgres psql -d fib < sql/fib/create_fibers.sql
 
 редактировать fibers/engine/setup.php
 
-$host=$_SERVER['SERVER_ADDR'];
-$addr_obl='Кемеровская область';
+    $host=$_SERVER['SERVER_ADDR'];
+    $addr_obl='Кемеровская область';
+
+где $host - ip адрес или хост веб сервера, $addr_obl - область, город, которые подставляются в nominatim, можно проверить https://nominatim.openstreetmap.org/
 
 редактировать fibers/js/action.js
 
-var host = '172.17.2.249';
+    var host = '172.17.2.249';
 
+где host аналогично $host
 
 редактировать fibers/geomap.php
 
-$lon=(@$_GET['lon']?$_GET['lon']:'73.43708');
-$lat=(@$_GET['lat']?$_GET['lat']:'61.257358');
+    $lon=(@$_GET['lon']?$_GET['lon']:'73.43708');
+    $lat=(@$_GET['lat']?$_GET['lat']:'61.257358');
 
+где $lon - долгота, $lat - широта, править цифры 73.43708 и 61.257358
 
 по дефолту логин пасс в опенгео admin/geoserver
 
-заходим http://172.17.2.249:8080/geoserver/web/
+заходим http://ip_адрес_либо_хост:8080/geoserver/web/
 
 добавляем стили
 
