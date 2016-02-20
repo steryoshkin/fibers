@@ -2,7 +2,7 @@
 	@header('Content-Type: text/html; charset=utf-8');
 	include_once ('class/xml2array.php');
 	
-	$host=$_SERVER['SERVER_ADDR'];
+	$host='172.17.2.249';
 	$addr_obl='Кемеровская область';
 
 	session_start();
