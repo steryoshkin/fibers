@@ -71,8 +71,8 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
         function init(){
             var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
 	        var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
-	        var position       = new OpenLayers.LonLat(<? echo $lon.','.$lat; ?>).transform( fromProjection, toProjection);
-	        var zoom           = <? echo $zoom; ?>;
+	        var position       = new OpenLayers.LonLat(<?php echo $lon.','.$lat; ?>).transform( fromProjection, toProjection);
+	        var zoom           = <?php echo $zoom; ?>;
 
             map = new OpenLayers.Map(
 				'map',
