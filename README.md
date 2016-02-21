@@ -147,6 +147,8 @@ Ubuntu Server
 
 Изначально центр непойми где, его можно изменить в файле /usr/share/opengeo/geoexplorer/WEB-INF/app/templates/composer.html -> center: [0, 0] и zoom: 2
 
+Здесь координаты в метрах, пересчитать коодринаты можно тут http://www.latlong.ru/sk.php
+
 логинпасс как в геосервер
 
         выделяем слой node, редактировать -> создать
