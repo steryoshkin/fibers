@@ -1,19 +1,6 @@
-<?
+<?php
 	header("Content-type: image/png");
 
-/*	function toUnicodeEntities($text, $from="w")
-	{
-		$text = convert_cyr_string($text, $from, "i");
-		$uni = "";
-		for ($i=0, $len=strlen($text); $i<$len; $i++)
-		{
-		$char = $text{$i};
-		$code = ord($char);
-		$uni .= ($code>175)? "&#" . (1040+($code-176)) . ";" : $char;
-		}
-		return $uni;
-	}*/
-	
 	if(isset($_GET['text']))
 	{
 		$text=$_GET['text'];
