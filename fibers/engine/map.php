@@ -1,4 +1,4 @@
-<?
+<?php
 
     include_once ('setup.php');
     include_once ('db.php');
@@ -57,7 +57,7 @@ function get_node_map($node,$node_old)
 <!DOCTYPE html>
 <html>
 <head>
-    <title><?echo $title?></title>
+    <title><?php echo $title?></title>
     <script type="text/javascript" src="../js/vivagraph/vivagraph.js"></script>
     <script type="text/javascript" src="../js/lib/jquery-1.7.1-min.js"></script>
     <!--<script type="text/javascript" src="js/lib/jquery.poshytip.js"></script>-->
@@ -72,7 +72,7 @@ function get_node_map($node,$node_old)
 				gravity : -50.2
 			});
 
-			<? echo $content; ?>
+			<?php echo $content; ?>
 
 			var graphics = Viva.Graph.View.svgGraphics(),
 			nodeSize = 24,
@@ -125,16 +125,16 @@ function get_node_map($node,$node_old)
                 //http://www.w3schools.com/cssref/css_colornames.asp
                 var fib=link.data[1];
                 color='silver';
-                if(fib==2) color='<? echo $cable_color['cable_2']; ?>';
-                if(fib==4) color='<? echo $cable_color['cable_4']; ?>';
-                if(fib==6) color='<? echo $cable_color['cable_6']; ?>';
-				if(fib==8) color='<? echo $cable_color['cable_8']; ?>';
-				if(fib==16) color='<? echo $cable_color['cable_16']; ?>';
-				if(fib==24) color='<? echo $cable_color['cable_24']; ?>';
-				if(fib==32) color='<? echo $cable_color['cable_32']; ?>';
-				if(fib==48) color='<? echo $cable_color['cable_48']; ?>';
-				if(fib==64) color='<? echo $cable_color['cable_64']; ?>';
-				if(fib==96) color='<? echo $cable_color['cable_96']; ?>';
+                if(fib==2) color='<?php echo $cable_color['cable_2']; ?>';
+                if(fib==4) color='<?php echo $cable_color['cable_4']; ?>';
+                if(fib==6) color='<?php echo $cable_color['cable_6']; ?>';
+				if(fib==8) color='<?php echo $cable_color['cable_8']; ?>';
+				if(fib==16) color='<?php echo $cable_color['cable_16']; ?>';
+				if(fib==24) color='<?php echo $cable_color['cable_24']; ?>';
+				if(fib==32) color='<?php echo $cable_color['cable_32']; ?>';
+				if(fib==48) color='<?php echo $cable_color['cable_48']; ?>';
+				if(fib==64) color='<?php echo $cable_color['cable_64']; ?>';
+				if(fib==96) color='<?php echo $cable_color['cable_96']; ?>';
 
 				var ui = Viva.Graph.svg('path')
 							.attr('stroke', color)
@@ -188,7 +188,7 @@ function get_node_map($node,$node_old)
 <body onload='main()'>
     <svg xmlns="http://www.w3.org/2000/svg"
 	     xmlns:xlink="http://www.w3.org/1999/xlink">
-	<?
+	<?php
 	$nodes_tmp = array();
 	foreach ($nodes as $key => $value) {
 		$nodes_tmp[$value['cable_fib']]=$value['cable_name'];
