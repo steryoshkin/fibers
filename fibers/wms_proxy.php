@@ -19,10 +19,8 @@
 	}
 	
 	if(isset($_GET['args'])) {
-		//$result = file_get_contents('http://pto.rdtc.ru:8080/geoserver/opengeo/wms?'.$_GET['args']);
 		//$result = file_get_contents('http://'.$host.':8080/geoserver/opengeo/'.$_GET['args']);
-		$result = file_get_contents('http://'.$host.':8080/geoserver/opengeo/'.$_GET['args']);
-		//echo 'http://pto.rdtc.ru:8080/geoserver/opengeo/wms?'.$_GET['args'];
+		$result = file_get_contents('http://localhost:8080/geoserver/opengeo/'.$_GET['args']);
 		//print_r($result);
 		$array = XML2Array::createArray($result);
 		/*echo '<pre>';
