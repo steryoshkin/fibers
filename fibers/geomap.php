@@ -97,7 +97,7 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
 				{tileOptions: {crossOriginKeyword: null}}
 			);
 
-    		var ver=184;
+    		var ver=198;
             var google_sat = new OpenLayers.Layer.OSM(
                 	google_sat_map_name,
     				["https://khms0.google.com/kh/v=" + ver +"&src=app&x=${x}&y=${y}&z=${z}&s=Gal",
