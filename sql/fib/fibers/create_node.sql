@@ -17,7 +17,7 @@ CREATE TABLE fibers.node
   user_id integer,
   the_geom geometry(Point,4326),
   type integer DEFAULT 0,
-  loc_text character varying(100) COLLATE pg_catalog."ru_RU.utf8",
+  loc_text character varying(100),
   is_new boolean NOT NULL DEFAULT true,
   u_const boolean DEFAULT true,
   date timestamp without time zone,
