@@ -3,7 +3,7 @@
 // логин пользователя БД
 	$user_db="st";
 // пароль пользователя БД
-	$user_pass="pass";
+	$user_pass="Gfhjkzytne1";
 // хост БД
 	$host_db="localhost";
 // БД

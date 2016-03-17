@@ -9,7 +9,6 @@ CREATE TABLE fibers.area
   descrip character varying(255),
   user_id integer,
   city_id integer,
-  region_id integer,
   CONSTRAINT area_pkey PRIMARY KEY (id)
 )
 WITH (

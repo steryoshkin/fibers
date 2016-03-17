@@ -314,47 +314,47 @@
 	}
 // конец загрузка файлов
 
-// район begin -------------------------------------------------------------------------------------------------------
-// ввод нового/редактирование района в div
-    if(isset($_GET['act']) && ($_GET['act']=='n_area' || $_GET['act']=='e_area') ) {
-    	if($_GET['act']=='e_area')
+// область begin -------------------------------------------------------------------------------------------------------
+// ввод нового/редактирование области в div
+    if(isset($_GET['act']) && ($_GET['act']=='n_region' || $_GET['act']=='e_region') ) {
+    	if($_GET['act']=='e_region')
     	{
     		$id=clean($_GET['id']);
-    		$sql="SELECT * FROM ".$table_area." AS ar1 WHERE ar1.id=".$id;
+    		$sql="SELECT * FROM ".$table_region." AS r1 WHERE r1.id=".$id;
     		$result=pg_fetch_assoc(pg_query($sql));
     		$name=$result['name'];
     		$descrip=$result['descrip'];
-    		$region_id=$result['region_id'];
     	}
 
     	$text='<input type="hidden" id="id" value="'.$id.'">';
-    	$text.='<div class="span5 m0 input-control text"><input type="text" id="name" value="'.$name.'" placeholder="Район" /></div>';
+    	$text.='<div class="span5 m0 input-control text"><input type="text" id="name" value="'.$name.'" placeholder="Область" /></div>';
     	$text.='<div class="span5 m0 input-control text"><input type="text" id="descrip" value="'.$descrip.'" placeholder="Описание" /></div>';
     	$text.=button_ok_cancel('div_new');
     	echo $text;
     	die;
     }
 
-// ввод нового/редактирование района в div post
-    if(isset($_POST['act']) && @is_numeric($_POST['id']) && isset($_POST['name']) && ($_POST['act']=='n_area' || $_POST['act']=='e_area') ) {
-    	$sql="SELECT * FROM ".$table_area." WHERE name='".clean($_POST['name'])."'";
+// ввод нового/редактирование области в div post
+    if(isset($_POST['act']) && @is_numeric($_POST['id']) && isset($_POST['name']) && ($_POST['act']=='n_region' || $_POST['act']=='e_region') ) {
+    	$sql="SELECT * FROM ".$table_region." WHERE name='".clean($_POST['name'])."'";
     	$text='';
-    	if($_POST['act']=='n_area') {
+    	if($_POST['act']=='n_region') {
     		if(@pg_result(pg_query($sql),0)) {
-    			$text="Создать невозможно, такой район существует!!!";
+    			$text="Создать невозможно, такоя область существует!!!";
     		} else {
-    			pg_query("INSERT INTO ".$table_area." (name,descrip,user_id) VALUES ('".clean($_POST['name'])."', ".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", ".$user_id.")");
+    			//echo "INSERT INTO ".$table_region." (name,descrip,user_id) VALUES ('".clean($_POST['name'])."', ".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", ".$user_id.")";
+    			pg_query("INSERT INTO ".$table_region." (name,descrip,user_id) VALUES ('".clean($_POST['name'])."', ".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", ".$user_id.")");
     		}
-    	} elseif($_POST['act']=='e_area') {
-		    if(@pg_result(pg_query($sql." AND region_id ".($_POST['region_id']?"=".$_POST['region_id']:"IS NULL")." AND descrip ".($_POST['descrip']?"='".$_POST['descrip']."'":"IS NULL")),0)) {
-    			$text="Изменить невозможно, такой район существует!!!".$_POST['region_id'];
+    	} elseif($_POST['act']=='e_region') {
+		    if(@pg_result(pg_query($sql." AND descrip ".($_POST['descrip']?"='".$_POST['descrip']."'":"IS NULL")),0)) {
+    			$text="Изменить невозможно, такоя область существует!!!";
     		} else {
-    			$data_old=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_area." WHERE id = ".clean($_POST['id']) ));
+    			$data_old=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_region." WHERE id = ".clean($_POST['id']) ));
 
-    			pg_query("UPDATE ".$table_area." SET name='".clean($_POST['name'])."', descrip=".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", user_id=".$user_id." WHERE id=".clean($_POST['id']).";")
-    				or die("Изменить невозможно, такой район существует!!!");
+    			pg_query("UPDATE ".$table_region." SET name='".clean($_POST['name'])."', descrip=".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", user_id=".$user_id." WHERE id=".clean($_POST['id']).";")
+    				or die("Изменить невозможно, такоя область существует!!!");
 
-    			$data_new=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_area." WHERE id = ".clean($_POST['id']) ));
+    			$data_new=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_region." WHERE id = ".clean($_POST['id']) ));
     			
     			$result = serialize(array_diff($data_old, $data_new));
     			add_log($table_area,clean($_POST['id']),$result,$user_id);
@@ -364,9 +364,198 @@
     	die;
     }
 
+// удаление области div
+    if(isset($_GET['act']) && $_GET['act']=='d_region' && @is_numeric($_GET['id'])) {
+    	$sql="SELECT COUNT(*) FROM ".$table_city." AS s1 WHERE s1.region_id =".clean($_GET['id']);
+    	$region_name=pg_result(pg_query("SELECT name FROM ".$table_region." AS r1 WHERE r1.id =".clean($_GET['id'])),0);
+    	if(pg_result(pg_query($sql),0)) {
+    		$text='<div class="span11 m5">&nbsp;Область "'.$region_name.'" используется. Удалить нельзя!!!</div>'.button_ok_cancel('div_cancel');
+    	} else {
+    		$text='<div class="span10 m5">&nbsp;Удалить область "'.$region_name.'"?</div>'.button_ok_cancel('div_del','d_region');
+    	}
+    	echo $text;
+    	die;
+    }
+
+    // удаление области sql
+    if(isset($_POST['act']) && $_POST['act']=='d_region' && @is_numeric($_POST['id']) ) {
+    	if(!@pg_result(pg_query("SELECT COUNT(*) FROM ".$table_city." AS r1 WHERE r1.region_id = ".clean($_POST['id']).""),0)) {
+
+    		$data_old=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_region." WHERE id = ".clean($_POST['id']) ));
+    		$result = serialize($data_old);
+    		add_log($table_region,clean($_POST['id']),$result,$user_id);
+
+    		pg_query("DELETE FROM ".$table_region." WHERE id = ".clean($_POST['id']));
+    	} else echo "not exist";
+    	die;
+    }
+// область end -------------------------------------------------------------------------------------------------------
+
+// город/посёлок begin -------------------------------------------------------------------------------------------------------
+// ввод новой/редактирование города/посёлка в div
+    if(isset($_GET['act']) && ($_GET['act']=='n_city' || $_GET['act']=='e_city') ) {
+    	if($_GET['act']=='e_city')
+    	{
+    		$id=clean($_GET['id']);
+    		$sql="SELECT * FROM ".$table_city." WHERE id = ".$id;
+    		$result=pg_fetch_assoc(pg_query($sql));
+    		$name=$result['name'];
+    		$region_id=$result['region_id'];
+    		$lat=$result['lat'];
+    		$lon=$result['lon'];
+    		$descrip=$result['descrip'];
+    	}
+    	$sql="SELECT * FROM ".$table_region." ORDER BY name";
+    	$result = pg_query($sql);
+    	if(pg_num_rows($result)){
+    		$select_region='<select id="region">';
+    		$select_region.='<option value="0">-Область-</option>';
+    		while($row=pg_fetch_assoc($result)){
+    			$select_region.='<option value="'.$row['id'].'"';
+    			if($region_id==$row['id']) {
+    				$select_region.=" SELECTED";
+    				$region_id=$row['region_id'];
+    			}
+    			$select_region.='>'.$row['name'].'</option>';
+    		}
+    		$select_region.='</select>';
+    	}
+
+    	$text='<input type="hidden" id="id" value="'.$id.'">';
+    	$text.='<div class="span3 m0 input-control text"><input type="text" id="name" value="'.$name.'" placeholder="Улица" /></div>';
+    	$text.='<div class="span3 m0 input-control text">'.$select_region.'</div>';
+    	$text.='<div class="span1_5 m0 input-control text"><input type="text" id="lat" value="'.$lat.'" placeholder="широта" /></div>';
+    	$text.='<div class="span1_5 m0 input-control text"><input type="text" id="lon" value="'.$lon.'" placeholder="долгота" /></div>';
+    	$text.='<div class="span4 m0 input-control text"><input type="text" id="descrip" value="'.$descrip.'" placeholder="Описание" /></div>';
+        $text.=button_ok_cancel('div_new');
+    	echo $text;
+    	die;
+    }
+
+// ввод новой/редактирование города/посёлка в div post
+    if(isset($_POST['act']) && @is_numeric($_POST['id']) && isset($_POST['name']) && ($_POST['act']=='n_city' || $_POST['act']=='e_city') && @is_numeric($_POST['region_id']) ) {
+        $sql="SELECT COUNT(*) FROM ".$table_city." WHERE name='".clean($_POST['name'])."' AND region_id=".clean($_POST['region_id']);
+    	if($_POST['act']=='n_city') {
+    		if(@pg_result(pg_query($sql),0)) {
+    			$text="Создать невозможно, такаой город/посёлок существует!!!";
+    		} else {
+    			pg_query("INSERT INTO ".$table_city." (name,region_id,descrip,user_id) VALUES ('".clean($_POST['name'])."', ".clean($_POST['region_id']).", ".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", ".$user_id.")");
+    		}
+    	} elseif($_POST['act']=='e_city') {
+    		if(@pg_result(pg_query($sql." AND region_id ".($_POST['region_id']?"=".$_POST['region_id']:"IS NULL")." AND descrip ".($_POST['descrip']?"='".$_POST['descrip']."'":"IS NULL")),0)) {
+    			$text="Изменить невозможно, такай город/посёлок существует!!!";
+    			////
+    		} else {
+    			$data_old=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_city." WHERE id = ".clean($_POST['id']) ));
+
+    			pg_query("UPDATE ".$table_city." SET name='".clean($_POST['name'])."', region_id=".clean($_POST['region_id']).", descrip=".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", user_id=".$user_id." WHERE id=".clean($_POST['id']).";")
+                    or die("Изменить невозможно, такай город/посёлок существует!!!");
+
+				$data_new=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_city." WHERE id = ".clean($_POST['id']) ));
+
+				$result = serialize(array_diff($data_old, $data_new));
+				add_log($table_city,clean($_POST['id']),$result,$user_id);
+    		}
+    	}
+    	echo @$text;
+    	die;
+    }
+
+// удаление города/посёлка div
+    if(isset($_GET['act']) && $_GET['act']=='d_city' && @is_numeric($_GET['id'])) {
+    	$sql="SELECT COUNT(*) FROM ".$table_area." AS a1 WHERE a1.city_id=".clean($_GET['id']);
+    	$city_name=pg_result(pg_query("SELECT name FROM ".$table_city." AS s1 WHERE s1.id =".clean($_GET['id'])),0);
+    	if(pg_result(pg_query($sql),0)) {
+    		$text='<div class="span11 m5">&nbsp;Город/посёлок "'.$city_name.'" используется. Удалить нельзя!!!</div>'.button_ok_cancel('div_cancel');
+    	} else {
+    		$text='<div class="span10 m5">&nbsp;Удалить город/посёлок "'.$city_name.'"?</div>'.button_ok_cancel('div_del','d_city');
+    	}
+    	echo $text;
+    	die;
+    }
+
+// удаление города/посёлка sql
+    if(isset($_POST['act']) && $_POST['act']=='d_city' && @is_numeric($_POST['id']) ) {
+    	if(!@pg_result(pg_query("SELECT COUNT(*) FROM ".$table_area." AS a1 WHERE a1.city_id = ".clean($_POST['id']).""),0)) {
+
+    		$data_old=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_city." WHERE id = ".clean($_POST['id']) ));
+    		$result = serialize($data_old);
+    		add_log($table_city,clean($_POST['id']),$result,$user_id);
+    		pg_query("DELETE FROM ".$table_city." WHERE id = ".clean($_POST['id']));
+    	} else echo "not exist";
+    	die;
+    }
+// город/посёлок end -------------------------------------------------------------------------------------------------------
+
+// район begin -------------------------------------------------------------------------------------------------------
+// ввод новой/редактирование района в div
+    if(isset($_GET['act']) && ($_GET['act']=='n_area' || $_GET['act']=='e_area') ) {
+    	if($_GET['act']=='e_area')
+    	{
+    		$id=clean($_GET['id']);
+    		$sql="SELECT * FROM ".$table_area." WHERE id = ".$id;
+    		$result=pg_fetch_assoc(pg_query($sql));
+    		$name=$result['name'];
+    		$city_id=$result['city_id'];
+    		$descrip=$result['descrip'];
+    	}
+    	$sql="SELECT * FROM ".$table_city." ORDER BY name";
+    	$result = pg_query($sql);
+    	if(pg_num_rows($result)){
+    		$select_city='<select id="city">';
+    		$select_city.='<option value="0">-Город/посёлок-</option>';
+    		while($row=pg_fetch_assoc($result)){
+    			$select_city.='<option value="'.$row['id'].'"';
+    			if($city_id==$row['id']) {
+    				$select_city.=" SELECTED";
+    				$city_id=$row['city_id'];
+    			}
+    			$select_city.='>'.$row['name'].'</option>';
+    		}
+    		$select_city.='</select>';
+    	}
+
+    	$text='<input type="hidden" id="id" value="'.$id.'">';
+    	$text.='<div class="span3 m0 input-control text"><input type="text" id="name" value="'.$name.'" placeholder="Район" /></div>';
+    	$text.='<div class="span3 m0 input-control text">'.$select_city.'</div>';
+    	$text.='<div class="span4 m0 input-control text"><input type="text" id="descrip" value="'.$descrip.'" placeholder="Описание" /></div>';
+        $text.=button_ok_cancel('div_new');
+    	echo $text;
+    	die;
+    }
+
+// ввод новой/редактирование района в div post
+    if(isset($_POST['act']) && @is_numeric($_POST['id']) && isset($_POST['name']) && ($_POST['act']=='n_area' || $_POST['act']=='e_area') && @is_numeric($_POST['city_id']) ) {
+        $sql="SELECT COUNT(*) FROM ".$table_area." WHERE name='".clean($_POST['name'])."' AND city_id=".clean($_POST['region_id']);
+    	if($_POST['act']=='n_area') {
+    		if(@pg_result(pg_query($sql),0)) {
+    			$text="Создать невозможно, такаой район существует!!!";
+    		} else {
+    			pg_query("INSERT INTO ".$table_area." (name,city_id,descrip,user_id) VALUES ('".clean($_POST['name'])."', ".clean($_POST['city_id']).", ".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", ".$user_id.")");
+    		}
+    	} elseif($_POST['act']=='e_area') {
+    		if(@pg_result(pg_query($sql." AND city_id ".($_POST['city_id']?"=".$_POST['city_id']:"IS NULL")." AND descrip ".($_POST['descrip']?"='".$_POST['descrip']."'":"IS NULL")),0)) {
+    			$text="Изменить невозможно, такай район существует!!!";
+    			////
+    		} else {
+    			$data_old=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_area." WHERE id = ".clean($_POST['id']) ));
+
+    			pg_query("UPDATE ".$table_area." SET name='".clean($_POST['name'])."', city_id=".clean($_POST['city_id']).", descrip=".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", user_id=".$user_id." WHERE id=".clean($_POST['id']).";")
+                    or die("Изменить невозможно, такай район существует!!!");
+
+				$data_new=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_area." WHERE id = ".clean($_POST['id']) ));
+
+				$result = serialize(array_diff($data_old, $data_new));
+				add_log($table_area,clean($_POST['id']),$result,$user_id);
+    		}
+    	}
+    	echo @$text;
+    	die;
+    }
+
 // удаление района div
     if(isset($_GET['act']) && $_GET['act']=='d_area' && @is_numeric($_GET['id'])) {
-    	$sql="SELECT COUNT(*) FROM ".$table_street_name." AS sn1 WHERE sn1.area_id =".clean($_GET['id']);
+    	$sql="SELECT COUNT(*) FROM ".$table_street_name." AS sn1 WHERE sn1.area_id=".clean($_GET['id']);
     	$area_name=pg_result(pg_query("SELECT name FROM ".$table_area." AS a1 WHERE a1.id =".clean($_GET['id'])),0);
     	if(pg_result(pg_query($sql),0)) {
     		$text='<div class="span11 m5">&nbsp;Район "'.$area_name.'" используется. Удалить нельзя!!!</div>'.button_ok_cancel('div_cancel');
@@ -377,14 +566,13 @@
     	die;
     }
 
-    // удаление района sql
+// удаление района sql
     if(isset($_POST['act']) && $_POST['act']=='d_area' && @is_numeric($_POST['id']) ) {
     	if(!@pg_result(pg_query("SELECT COUNT(*) FROM ".$table_street_name." AS sn1 WHERE sn1.area_id = ".clean($_POST['id']).""),0)) {
 
     		$data_old=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_area." WHERE id = ".clean($_POST['id']) ));
     		$result = serialize($data_old);
     		add_log($table_area,clean($_POST['id']),$result,$user_id);
-
     		pg_query("DELETE FROM ".$table_area." WHERE id = ".clean($_POST['id']));
     	} else echo "not exist";
     	die;
@@ -392,7 +580,6 @@
 // район end -------------------------------------------------------------------------------------------------------
 
 // улица begin -------------------------------------------------------------------------------------------------------
-
 // ввод новой/редактирование улицы в div
     if(isset($_GET['act']) && ($_GET['act']=='n_street_name' || $_GET['act']=='e_street_name') ) {
     	if($_GET['act']=='e_street_name')

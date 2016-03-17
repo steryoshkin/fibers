@@ -267,6 +267,83 @@ $(document).ready(
         });
 // добавление в div end -------------------------------------------------------------------------------------------------------
 
+// область begin -------------------------------------------------------------------------------------------------------
+// изменение, внесение новой области в div
+        $("button#n_region,#e_region").live('click', function(event) {
+        	if($('input#name').val()==0) {
+        		alert('Введите область');
+        		$('input#name').focus();
+        		return false;
+        	} else
+        		var id = $("input#id").val(); 
+        	if(!id) id=0;
+        	$.post("./engine/backend.php", {
+        		act: $(this).attr('id'),
+        		id: id,
+        		name: $('input#name').val(),
+        		descrip: $('input#descrip').val()
+        	}, function (reply) {
+        		if(reply)
+        			alert(reply);
+        		else
+        			window.location.reload();
+        		return false;
+        	});
+        });
+ // удаление области
+        $("button#d_region").live('click', function(event) {
+        	$.post("./engine/backend.php", {
+        		act: 'd_region',
+        		id: $(this).attr("rel"),
+        	}, function (reply) {
+        		if(reply) alert(reply);
+        		window.location.reload();
+        	});
+        	return false;
+        });
+ // область end -------------------------------------------------------------------------------------------------------
+
+// город/посёлок begin -------------------------------------------------------------------------------------------------------
+// изменение, внесение нового города/посёлока в div
+              $("button#n_city,#e_city").live('click', function(event) {
+                  if($('input#name').val()==0) {
+                      alert('Введите город/посёлок');
+                      $('input#name').focus();
+                      return false;
+                  } else if($('select#region').val()==0) {
+                      alert('Введите область');
+                      $('input#area').focus();
+                      return false;
+                  } else
+                  var id = $("input#id").val(); 
+                  if(!id) id=0;
+                  $.post("./engine/backend.php", {
+                      act: $(this).attr('id'),
+                      id: id,
+                      name: $('input#name').val(),
+                      region_id: $('select#region').val(),
+                      descrip: $('input#descrip').val()
+                  }, function (reply) {
+                      if(reply)
+                          alert(reply);
+                      else
+                          window.location.reload();
+                  return false;
+                  });
+              });
+// удаление города/посёлока
+              $("button#d_city").live('click', function(event) {
+                  $.post("./engine/backend.php", {
+                      act: 'd_city',
+                      id: $(this).attr("rel"),
+                  }, function (reply) {
+                      if(reply) alert(reply);
+                      window.location.reload();
+                  });
+                  return false;
+              });
+// город/посёлок end -------------------------------------------------------------------------------------------------------
+
 // район begin -------------------------------------------------------------------------------------------------------
 // изменение, внесение нового района в div
         //$("button#[id$='_area']").live('click', function(event) {
@@ -282,8 +359,8 @@ $(document).ready(
                 act: $(this).attr('id'),
                 id: id,
                 name: $('input#name').val(),
+                city_id: $('select#city').val(),
                 descrip: $('input#descrip').val(),
-                region_id: $('select#region_id').val(),
             }, function (reply) {
                 //alert(reply.length);
             	// хз, но когда пустота, то кажет что длинна 4
@@ -308,11 +385,6 @@ $(document).ready(
 // район end -------------------------------------------------------------------------------------------------------
 
 // улица begin -------------------------------------------------------------------------------------------------------
-// после выбора раона выводит список улиц из агентс 
-        	 $("select#area").live('change', function(event) {
-        		 get_uk_info_agents_select_area($("select#area").val());
-        		 return false;
-        	 });
 // изменение, внесение новой улицы в div
              $("button#n_street_name,#e_street_name").live('click', function(event) {
                  if($('input#name').val()==0) {
@@ -1454,6 +1526,7 @@ $(document).ready(
             //if($(this).attr('id')!='cable_del_in_div' || confirm("Удалить тип кабеля?"))
             if($(this).attr('id')!='color_del_in_div' || confirm("Удалить цвет?"))
             //alert($(this).attr("rel"));
+            //alert("./engine/backend.php"+$(this).attr("rel"));
             $.post("./engine/backend.php"+$(this).attr("rel"), function (reply) {
             	//alert(reply);
             	if(reply=='reload') {

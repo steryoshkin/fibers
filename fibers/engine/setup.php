@@ -29,6 +29,7 @@
     $table_pq_type='fibers.pq_type';
     $table_cable_type='fibers.cable_type';
     
+    $table_region='fibers.region';
     $table_city='fibers.city';
     $table_area='fibers.area';
     $table_street_name='fibers.street_name';

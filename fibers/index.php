@@ -36,6 +36,8 @@ function show_menu() {
                 <ul class="text-left">
                     <li class="sub-menu"><a href="#">Адреса</a>
                         <ul class="text-left">
+                        	<li><a href="?act=dirs&dir=region">Область	</a></li>
+                        	<li><a href="?act=dirs&dir=city">Город/посёлок</a></li>
                             <li><a href="?act=dirs&dir=area">Район</a></li>
                             <li><a href="?act=dirs&dir=street">Улица</a></li>
                             <li><a href="?act=dirs&dir=location">Размещение</a></li>
@@ -853,8 +855,117 @@ if (isset($_GET['act']) && $_GET['act'] == 'dirs' && ($group_access['dirs'] || $
 	$i=1;
 	$title = 'Справочники';
 
+// редактирование Области
+	if($_GET['dir'] == 'region' && $group_access['dirs']) {
+		$i=1;
+		$title.= ' > Область';
+		$action='
+		<div class="span2 m5 input-control text">Область</div>
+		<div class="span m0 text-left">
+			<button class="m0" id="in_div" rel="?act=n_region" type="button" />Добавить область</button>
+		</div>';
+		$sql = "SELECT * FROM " . $table_region . " AS ar1 ORDER BY name;";
+		$result = pg_query($con_id, $sql);
+		if (pg_num_rows($result)) {
+			$content='<table class="striped">';
+			$content.='<tr>';
+			$content.='<td class="span1">№</td>';
+			$content.='<td class="span5">Наименование</td>';
+			$content.='<td class="span8">Описание</td>';
+			$content.='<td class="span2">&nbsp;</td>';
+			$content.='</tr>';
+			$content.='<tr>';
+			while ($row = pg_fetch_assoc($result)) {
+				$content.='<td>'.$i.'</td>';
+				$content.='<td>'.$row['name'].'&nbsp;</td>';
+				$content.='<td>'.$row['descrip'].'&nbsp;</td>';
+				$content.='
+				<td class="toolbar m0">
+					<button class="icon-pencil m0 mini" id="region_edit_in_div" rel="?act=e_region&id='.$row['id'].'" title="Редактировать"></button>
+					<button class="icon-cancel-2 m0 mini" id="region_del_in_div" rel="?act=d_region&id='.$row['id'].'" title="Удалить"></button>
+				</td>';
+				$content.='</tr>';
+				$i++;
+			}
+			$content.='</table>';
+		}
+	}
+
+// редактирование Области
+	if($_GET['dir'] == 'region' && $group_access['dirs']) {
+		$i=1;
+		$title.= ' > Область';
+		$action='
+		<div class="span2 m5 input-control text">Область</div>
+		<div class="span m0 text-left">
+			<button class="m0" id="in_div" rel="?act=n_region" type="button" />Добавить область</button>
+		</div>';
+		$sql = "SELECT * FROM " . $table_region . " AS ar1 ORDER BY name;";
+		$result = pg_query($con_id, $sql);
+		if (pg_num_rows($result)) {
+			$content='<table class="striped">';
+			$content.='<tr>';
+			$content.='<td class="span1">№</td>';
+			$content.='<td class="span5">Наименование</td>';
+			$content.='<td class="span8">Описание</td>';
+			$content.='<td class="span2">&nbsp;</td>';
+			$content.='</tr>';
+			$content.='<tr>';
+			while ($row = pg_fetch_assoc($result)) {
+				$content.='<td>'.$i.'</td>';
+				$content.='<td>'.$row['name'].'&nbsp;</td>';
+				$content.='<td>'.$row['descrip'].'&nbsp;</td>';
+				$content.='
+				<td class="toolbar m0">
+					<button class="icon-pencil m0 mini" id="region_edit_in_div" rel="?act=e_region&id='.$row['id'].'" title="Редактировать"></button>
+					<button class="icon-cancel-2 m0 mini" id="region_del_in_div" rel="?act=d_region&id='.$row['id'].'" title="Удалить"></button>
+				</td>';
+				$content.='</tr>';
+				$i++;
+			}
+			$content.='</table>';
+		}
+	}
+
+// редактирование Города/посёлка
+	if($_GET['dir'] == 'city' && $group_access['dirs']) {
+		$i=1;
+		$title.= ' > Город/посёлок';
+		$action='
+		<div class="span2 m5 input-control text">Город/посёлок</div>
+		<div class="span m0 text-left">
+			<button class="m0" id="in_div" rel="?act=n_city" type="button" />Добавить город/посёлок</button>
+		</div>';
+		$sql = "SELECT * FROM " . $table_city . " AS ar1 ORDER BY name;";
+		$result = pg_query($con_id, $sql);
+		if (pg_num_rows($result)) {
+			$content='<table class="striped">';
+			$content.='<tr>';
+			$content.='<td class="span1">№</td>';
+			$content.='<td class="span5">Наименование</td>';
+			$content.='<td class="span8">Описание</td>';
+			$content.='<td class="span2">&nbsp;</td>';
+			$content.='</tr>';
+			$content.='<tr>';
+			while ($row = pg_fetch_assoc($result)) {
+				$content.='<td>'.$i.'</td>';
+				$content.='<td>'.$row['name'].'&nbsp;</td>';
+				$content.='<td>'.$row['descrip'].'&nbsp;</td>';
+				$content.='
+				<td class="toolbar m0">
+					<button class="icon-pencil m0 mini" id="city_edit_in_div" rel="?act=e_city&id='.$row['id'].'" title="Редактировать"></button>
+					<button class="icon-cancel-2 m0 mini" id="city_del_in_div" rel="?act=d_city&id='.$row['id'].'" title="Удалить"></button>
+				</td>';
+				$content.='</tr>';
+				$i++;
+			}
+			$content.='</table>';
+		}
+	}
+
+
 // редактирование Районов
-	if($_GET['dir'] == 'area' && $group_access['dirs']) {
+	if($_GET['dir'] == 'area2' && $group_access['dirs']) {
 		$i=1;
 		$title.= ' > Район';
 		$action='
@@ -881,6 +992,44 @@ if (isset($_GET['act']) && $_GET['act'] == 'dirs' && ($group_access['dirs'] || $
 				<td class="toolbar m0">
 					<button class="icon-pencil m0 mini" id="area_edit_in_div" rel="?act=e_area&id='.$row['id'].'" title="Редактировать"></button>
 					<button class="icon-cancel-2 m0 mini" id="area_del_in_div" rel="?act=d_area&id='.$row['id'].'" title="Удалить"></button>
+				</td>';
+				$content.='</tr>';
+				$i++;
+			}
+			$content.='</table>';
+		}
+	}
+
+// редактирование Района
+	if($_GET['dir'] == 'area' && $group_access['dirs']) {
+		$i=1;
+		$title.= ' > Районы';
+		$action='
+		<div class="span2 m5 input-control text">Районы</div>
+		<div class="span m0 text-left">
+			<button class="m0" id="in_div" rel="?act=n_area" type="button" />Добавить район</button>
+		</div>';
+		$sql = "SELECT a1.*,c1.name AS city_name FROM ".$table_area." AS a1 LEFT JOIN ".$table_city." AS c1 ON a1.city_id = c1.id ORDER BY a1.name";
+		$result = pg_query($sql);
+		if (pg_num_rows($result)) {
+			$content='<table class="striped">';
+			$content.='<tr>';
+			$content.='<td class="span1">№</td>';
+			$content.='<td class="span4">Название</td>';
+			$content.='<td class="span4">Город/посёлок</td>';
+			$content.='<td class="span5">Описание</td>';
+			$content.='<td class="span2">&nbsp;</td>';
+			$content.='</tr>';
+			$content.='<tr>';
+			while ($row = pg_fetch_assoc($result)) {
+				$content.='<td>'.$i.'</td>';
+				$content.='<td>'.$row['name'].'</td>';
+				$content.='<td>'.$row['city_name'].'&nbsp;</td>';
+				$content.='<td>'.($row['descrip'] ? $row['descrip'] : "&nbsp;").'</td>';
+				$content.='
+				<td class="toolbar m0">
+				<button class="icon-pencil m0 mini" id="area_edit_in_div" rel="?act=e_area&id='.$row['id'].'" title="Редактировать"></button>
+				<button class="icon-cancel-2 m0 mini" id="area_del_in_div" rel="?act=d_area&id='.$row['id'].'" title="Удалить"></button>
 				</td>';
 				$content.='</tr>';
 				$i++;
