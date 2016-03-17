@@ -41,8 +41,8 @@ Ubuntu Server
 
 Создаём базу
 
-    sudo -u postgres psql < create_user.sql
-    sudo -u postgres psql < create_fib.sql
+    sudo -u postgres psql < sql/create_user.sql
+    sudo -u postgres psql < sql/create_fib.sql
     sudo -u postgres psql -d fib -c "CREATE EXTENSION postgis;"
     sudo -u postgres psql -d fib < sql/fib/create_fibers.sql
     
