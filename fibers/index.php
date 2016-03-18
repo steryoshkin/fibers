@@ -906,7 +906,7 @@ if (isset($_GET['act']) && $_GET['act'] == 'dirs' && ($group_access['dirs'] || $
 			$content='<table class="striped">';
 			$content.='<tr>';
 			$content.='<td class="span1">№</td>';
-			$content.='<td class="span5">Наименование</td>';
+			$content.='<td class="span5">Название</td>';
 			$content.='<td class="span8">Описание</td>';
 			$content.='<td class="span2">&nbsp;</td>';
 			$content.='</tr>';
@@ -936,13 +936,14 @@ if (isset($_GET['act']) && $_GET['act'] == 'dirs' && ($group_access['dirs'] || $
 		<div class="span m0 text-left">
 			<button class="m0" id="in_div" rel="?act=n_city" type="button" />Добавить город/посёлок</button>
 		</div>';
-		$sql = "SELECT * FROM " . $table_city . " AS ar1 ORDER BY name;";
+		$sql = "SELECT c1.*, r1.name AS region_name FROM " . $table_city . " AS c1, " . $table_region . " AS r1 WHERE c1.region_id = r1.id ORDER BY c1.name;";
 		$result = pg_query($con_id, $sql);
 		if (pg_num_rows($result)) {
 			$content='<table class="striped">';
 			$content.='<tr>';
 			$content.='<td class="span1">№</td>';
-			$content.='<td class="span5">Наименование</td>';
+			$content.='<td class="span4">Название</td>';
+			$content.='<td class="span5">Область</td>';
 			$content.='<td class="span8">Описание</td>';
 			$content.='<td class="span2">&nbsp;</td>';
 			$content.='</tr>';
@@ -950,48 +951,12 @@ if (isset($_GET['act']) && $_GET['act'] == 'dirs' && ($group_access['dirs'] || $
 			while ($row = pg_fetch_assoc($result)) {
 				$content.='<td>'.$i.'</td>';
 				$content.='<td>'.$row['name'].'&nbsp;</td>';
+				$content.='<td>'.$row['region_name'].'&nbsp;</td>';
 				$content.='<td>'.$row['descrip'].'&nbsp;</td>';
 				$content.='
 				<td class="toolbar m0">
 					<button class="icon-pencil m0 mini" id="city_edit_in_div" rel="?act=e_city&id='.$row['id'].'" title="Редактировать"></button>
 					<button class="icon-cancel-2 m0 mini" id="city_del_in_div" rel="?act=d_city&id='.$row['id'].'" title="Удалить"></button>
-				</td>';
-				$content.='</tr>';
-				$i++;
-			}
-			$content.='</table>';
-		}
-	}
-
-
-// редактирование Районов
-	if($_GET['dir'] == 'area2' && $group_access['dirs']) {
-		$i=1;
-		$title.= ' > Район';
-		$action='
-		<div class="span2 m5 input-control text">Район</div>
-		<div class="span m0 text-left">
-			<button class="m0" id="in_div" rel="?act=n_area" type="button" />Добавить район</button>
-		</div>';
-		$sql = "SELECT * FROM " . $table_area . " AS ar1 ORDER BY name;";
-		$result = pg_query($con_id, $sql);
-		if (pg_num_rows($result)) {
-			$content='<table class="striped">';
-			$content.='<tr>';
-			$content.='<td class="span1">№</td>';
-			$content.='<td class="span5">Наименование</td>';
-			$content.='<td class="span8">Описание</td>';
-			$content.='<td class="span2">&nbsp;</td>';
-			$content.='</tr>';
-			$content.='<tr>';
-			while ($row = pg_fetch_assoc($result)) {
-				$content.='<td>'.$i.'</td>';
-				$content.='<td>'.$row['name'].'&nbsp;</td>';
-				$content.='<td>'.$row['descrip'].'&nbsp;</td>';
-				$content.='
-				<td class="toolbar m0">
-					<button class="icon-pencil m0 mini" id="area_edit_in_div" rel="?act=e_area&id='.$row['id'].'" title="Редактировать"></button>
-					<button class="icon-cancel-2 m0 mini" id="area_del_in_div" rel="?act=d_area&id='.$row['id'].'" title="Удалить"></button>
 				</td>';
 				$content.='</tr>';
 				$i++;
@@ -1009,15 +974,17 @@ if (isset($_GET['act']) && $_GET['act'] == 'dirs' && ($group_access['dirs'] || $
 		<div class="span m0 text-left">
 			<button class="m0" id="in_div" rel="?act=n_area" type="button" />Добавить район</button>
 		</div>';
-		$sql = "SELECT a1.*,c1.name AS city_name FROM ".$table_area." AS a1 LEFT JOIN ".$table_city." AS c1 ON a1.city_id = c1.id ORDER BY a1.name";
+		//$sql = "SELECT a1.*,c1.name AS city_name FROM ".$table_area." AS a1 LEFT JOIN ".$table_city." AS c1 ON a1.city_id = c1.id ORDER BY a1.name";
+		$sql = "SELECT a1.*,c1.name AS city_name,r1.name AS region_name FROM ".$table_area." AS a1, ".$table_city." AS c1, ".$table_region." AS r1 WHERE a1.city_id = c1.id AND c1.region_id = r1.id ORDER BY c1.name, a1.name";
 		$result = pg_query($sql);
 		if (pg_num_rows($result)) {
 			$content='<table class="striped">';
 			$content.='<tr>';
 			$content.='<td class="span1">№</td>';
-			$content.='<td class="span4">Название</td>';
-			$content.='<td class="span4">Город/посёлок</td>';
-			$content.='<td class="span5">Описание</td>';
+			$content.='<td class="span3">Название</td>';
+			$content.='<td class="span3">Город/посёлок</td>';
+			$content.='<td class="span4">Область</td>';
+			$content.='<td class="span6">Описание</td>';
 			$content.='<td class="span2">&nbsp;</td>';
 			$content.='</tr>';
 			$content.='<tr>';
@@ -1025,6 +992,7 @@ if (isset($_GET['act']) && $_GET['act'] == 'dirs' && ($group_access['dirs'] || $
 				$content.='<td>'.$i.'</td>';
 				$content.='<td>'.$row['name'].'</td>';
 				$content.='<td>'.$row['city_name'].'&nbsp;</td>';
+				$content.='<td>'.$row['region_name'].'&nbsp;</td>';
 				$content.='<td>'.($row['descrip'] ? $row['descrip'] : "&nbsp;").'</td>';
 				$content.='
 				<td class="toolbar m0">
@@ -1047,15 +1015,15 @@ if (isset($_GET['act']) && $_GET['act'] == 'dirs' && ($group_access['dirs'] || $
 		<div class="span m0 text-left">
 			<button class="m0" id="in_div" rel="?act=n_street_name" type="button" />Добавить улицу</button>
 		</div>';
-		$sql = "SELECT sn1.*, ar1.name AS area_name FROM ".$table_street_name." AS sn1 LEFT JOIN ".$table_area." AS ar1 ON sn1.area_id = ar1.id ORDER BY sn1.name;";
+		$sql = "SELECT sn1.*, a1.name AS area_name, c1.name AS city_name FROM ".$table_street_name." AS sn1, ".$table_area." AS a1, ".$table_city." AS c1 WHERE sn1.area_id = a1.id AND a1.city_id = c1.id ORDER BY sn1.name";
 		$result = pg_query($sql);
 		if (pg_num_rows($result)) {
 			$content='<table class="striped">';
 			$content.='<tr>';
 			$content.='<td class="span1">№</td>';
-			$content.='<td class="span4">Название</td>';
-			$content.='<td class="span3">Кратк. название</td>';
-			$content.='<td class="span4">Район</td>';
+			$content.='<td class="span3">Название</td>';
+			$content.='<td class="span2">Кр. назв.</td>';
+			$content.='<td class="span5">Район</td>';
 			$content.='<td class="span5">Описание</td>';
 			$content.='<td class="span2">&nbsp;</td>';
 			$content.='</tr>';
@@ -1064,7 +1032,7 @@ if (isset($_GET['act']) && $_GET['act'] == 'dirs' && ($group_access['dirs'] || $
 				$content.='<td>'.$i.'</td>';
 				$content.='<td>'.$row['name'].'</td>';
 				$content.='<td>'.$row['small_name'].'&nbsp;</td>';
-				$content.='<td>'.$row['area_name'].'&nbsp;</td>';
+				$content.='<td>'.$row['area_name'].' ('.$row['city_name'].')&nbsp;</td>';
 				$content.='<td>'.($row['descrip'] ? $row['descrip'] : "&nbsp;").'</td>';
 				$content.='
 				<td class="toolbar m0">

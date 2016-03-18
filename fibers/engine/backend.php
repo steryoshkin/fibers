@@ -327,8 +327,8 @@
     	}
 
     	$text='<input type="hidden" id="id" value="'.$id.'">';
-    	$text.='<div class="span5 m0 input-control text"><input type="text" id="name" value="'.$name.'" placeholder="Область" /></div>';
-    	$text.='<div class="span5 m0 input-control text"><input type="text" id="descrip" value="'.$descrip.'" placeholder="Описание" /></div>';
+    	$text.='<div class="span4 m0 input-control text"><input type="text" id="name" value="'.$name.'" placeholder="Область" /></div>';
+    	$text.='<div class="span6 m0 input-control text"><input type="text" id="descrip" value="'.$descrip.'" placeholder="Описание" /></div>';
     	$text.=button_ok_cancel('div_new');
     	echo $text;
     	die;
@@ -499,7 +499,7 @@
     		$city_id=$result['city_id'];
     		$descrip=$result['descrip'];
     	}
-    	$sql="SELECT * FROM ".$table_city." ORDER BY name";
+    	$sql="SELECT c1.*,r1.name AS region_name FROM ".$table_city." AS c1, ".$table_region." AS r1 WHERE c1.region_id = r1.id ORDER BY c1.name";
     	$result = pg_query($sql);
     	if(pg_num_rows($result)){
     		$select_city='<select id="city">';
@@ -510,14 +510,14 @@
     				$select_city.=" SELECTED";
     				$city_id=$row['city_id'];
     			}
-    			$select_city.='>'.$row['name'].'</option>';
+    			$select_city.='>'.$row['name'].' ('.$row['region_name'].')</option>';
     		}
     		$select_city.='</select>';
     	}
 
     	$text='<input type="hidden" id="id" value="'.$id.'">';
     	$text.='<div class="span3 m0 input-control text"><input type="text" id="name" value="'.$name.'" placeholder="Район" /></div>';
-    	$text.='<div class="span3 m0 input-control text">'.$select_city.'</div>';
+    	$text.='<div class="span4 m0 input-control text">'.$select_city.'</div>';
     	$text.='<div class="span4 m0 input-control text"><input type="text" id="descrip" value="'.$descrip.'" placeholder="Описание" /></div>';
         $text.=button_ok_cancel('div_new');
     	echo $text;
@@ -593,7 +593,7 @@
     		$descrip=$result['descrip'];
     		$street_id=$result['street_id'];
     	}
-    	$sql="SELECT * FROM ".$table_area." ORDER BY name";
+    	$sql="SELECT a1.*,c1.name AS city_name FROM ".$table_area." AS a1, ".$table_city." AS c1 WHERE a1.city_id = c1.id ORDER BY a1.name";
     	$result = pg_query($sql);
     	if(pg_num_rows($result)){
     		$select_area='<select id="area">';
@@ -604,7 +604,7 @@
     				$select_area.=" SELECTED";
     				$region_id=$row['region_id'];
     			}
-    			$select_area.='>'.$row['name'].'</option>';
+    			$select_area.='>'.$row['name'].'('.$row['city_name'].')</option>';
     		}
     		$select_area.='</select>';
     	}
@@ -612,8 +612,8 @@
     	$text='<input type="hidden" id="id" value="'.$id.'">';
     	$text.='<div class="span3 m0 input-control text"><input type="text" id="name" value="'.$name.'" placeholder="Улица" /></div>';
     	$text.='<div class="span2 m0 input-control text"><input type="text" id="small_name" value="'.$small_name.'" placeholder="Улица (кр. название)" /></div>';
-    	$text.='<div class="span2 m0 input-control text">'.$select_area.'</div>';
-    	$text.='<div class="span2 m0 input-control text"><input type="text" id="descrip" value="'.$descrip.'" placeholder="Описание" /></div>';
+    	$text.='<div class="span4 m0 input-control text">'.$select_area.'</div>';
+    	$text.='<div class="span4 m0 input-control text"><input type="text" id="descrip" value="'.$descrip.'" placeholder="Описание" /></div>';
         $text.=button_ok_cancel('div_new');
     	echo $text;
     	die;
@@ -1524,10 +1524,7 @@ function set_color($table,$id,$type,$color_id) {
 	    	$text.='<div class="span3 m0 input-control text" '.($_GET['act']=='e_node'?'style="display: none;"':'').'>'.$select_node.'</div>';
 	    	$text.='<div class="span3 m0 input-control text">'.$select_street_name.'</div>';
 	    	$text.='<div class="span1 span1_5 m0 input-control text"><input class="mini" type="text" id="street_num" value="'.@$street_num.'" placeholder="№ дома" /></div>';
-	    	
-	    	//$text.='<div class="span1 span1_5 m0 input-control text">'.$select_street_num.'</div>';
-	    	
-	    	$text.='<div class="span1 m0 input-control text"><input class="mini" type="text" id="num_ent" value="'.@$num_ent.'" placeholder="№ подъезда" /></div>';
+	    	$text.='<div class="span1 span1_5 m0 input-control text"><input class="mini" type="text" id="num_ent" value="'.@$num_ent.'" placeholder="№ подъезда" /></div>';
 	    	$text.='<div class="span1 span1_5 m0 input-control text">'.$select_location.'</div>';
 	    	$text.='<div class="span1 span1_5 m0 input-control text">'.$select_room.'</div>';
 	    	$text.='<div class="span1 span2 m0 input-control text">'.$select_node_type.'</div>';
