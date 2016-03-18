@@ -422,7 +422,7 @@
     	}
 
     	$text='<input type="hidden" id="id" value="'.$id.'">';
-    	$text.='<div class="span3 m0 input-control text"><input type="text" id="name" value="'.$name.'" placeholder="Улица" /></div>';
+    	$text.='<div class="span3 m0 input-control text"><input type="text" id="name" value="'.$name.'" placeholder="Город/посёлок" /></div>';
     	$text.='<div class="span3 m0 input-control text">'.$select_region.'</div>';
     	$text.='<div class="span1_5 m0 input-control text"><input type="text" id="lat" value="'.$lat.'" placeholder="широта" /></div>';
     	$text.='<div class="span1_5 m0 input-control text"><input type="text" id="lon" value="'.$lon.'" placeholder="долгота" /></div>';
