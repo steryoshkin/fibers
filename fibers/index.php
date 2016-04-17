@@ -192,7 +192,8 @@ if (isset($_GET['act']) && $_GET['act'] == 's_node' && $group_access['node']) {
     //районы
     $sql="SELECT * FROM ".$table_city." ORDER BY id,name";
     $result = pg_query($sql);
-    $select_city='<select id="select_city" onChange="var city_id=\'\'; if($(\'select#select_city\').val()) city_id=\'&city_id=\'+$(\'select#select_city\').val(); window.location=\'?act=s_node'.(isset($_GET['find_node'])?'&find_node='.clean($_GET['find_node']):'').(@is_numeric($_GET['page'])?'&page='.clean($_GET['page']):'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'\'+city_id;">';
+    //$select_city='<select id="select_city" onChange="var city_id=\'\'; if($(\'select#select_city\').val()) city_id=\'&city_id=\'+$(\'select#select_city\').val(); window.location=\'?act=s_node'.(isset($_GET['find_node'])?'&find_node='.clean($_GET['find_node']):'').(@is_numeric($_GET['page'])?'&page='.clean($_GET['page']):'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'\'+city_id;">';
+    $select_city='<select id="select_city" onChange="var city_id=\'\'; if($(\'select#select_city\').val()) city_id=\'&city_id=\'+$(\'select#select_city\').val(); window.location=\'?act=s_node\'+city_id;">';
     //$select_city.='<option value="">Все города</option>';
     if(pg_num_rows($result)){
     	while($row=pg_fetch_assoc($result)){
@@ -251,7 +252,8 @@ if (isset($_GET['act']) && $_GET['act'] == 's_node' && $group_access['node']) {
     	$find_node = "AND lower(n1.address_full) LIKE lower('".str_replace(" ", "%", str_replace("*", "%", clean($_GET['find_node'])))."')";
     }
     
-    $sql_count = "SELECT COUNT(*) FROM ".$table_node." AS n1, ".$table_street_name." AS s_name WHERE n1.street_id = s_name.id " . $find_node.(@is_numeric($_GET['area_id'])?" AND s_name.area_id = ".$_GET['area_id']:"").(@is_numeric($_GET['node_type_id'])?" AND n1.node_type_id = ".$_GET['node_type_id']:"");
+    $sql_count = "SELECT COUNT(*) FROM ".$table_node." AS n1, ".$table_street_name." AS s_name, ".$table_area." AS a1 WHERE s_name.area_id = a1.id AND a1.city_id = ".$_GET['city_id']." AND n1.street_id = s_name.id " . $find_node.(@is_numeric($_GET['area_id'])?" AND s_name.area_id = ".$_GET['area_id']:"").(@is_numeric($_GET['node_type_id'])?" AND n1.node_type_id = ".$_GET['node_type_id']:"");
+    		
     $total_rows=pg_fetch_row(pg_query($sql_count));
 
     //$sql_count_map = "SELECT COUNT(*) FROM ".$table_node." AS n1, ".$table_street_name." AS s_name WHERE n1.street_id = s_name.id AND n1.the_geom IS NULL " . $find_node;
@@ -270,7 +272,7 @@ if (isset($_GET['act']) && $_GET['act'] == 's_node' && $group_access['node']) {
         if ($a-1 == $page) {
             $pages.='<div class="b_m">'.$a.'</div>';
         } else {
-            $pages.='<div class="b_m"><a class="b_m_a" href="?act=s_node'.$find.'&page='.$a.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'">'.$a.'</a></div>';
+            $pages.='<div class="b_m"><a class="b_m_a" href="?act=s_node'.$find.'&page='.$a.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').(isset($_GET['city_id'])?'&city_id='.clean($_GET['city_id']):'').'">'.$a.'</a></div>';
         }
     }
     $pages='<div class="text-center">
@@ -964,7 +966,7 @@ if (isset($_GET['act']) && $_GET['act'] == 'dirs' && ($group_access['dirs'] || $
 		<div class="span m0 text-left">
 			<button class="m0" id="in_div" rel="?act=n_city" type="button" />Добавить город/посёлок</button>
 		</div>';
-		$sql = "SELECT c1.*, r1.name AS region_name FROM " . $table_city . " AS c1, " . $table_region . " AS r1 WHERE c1.region_id = r1.id ORDER BY c1.name;";
+		$sql = "SELECT c1.*, r1.name AS region_name, ST_X(ST_astext(c1.the_geom)) AS lat, ST_Y(ST_astext(c1.the_geom)) AS lon FROM " . $table_city . " AS c1, " . $table_region . " AS r1 WHERE c1.region_id = r1.id ORDER BY c1.name;";
 		$result = pg_query($con_id, $sql);
 		if (pg_num_rows($result)) {
 			$content='<table class="striped">';
@@ -972,6 +974,8 @@ if (isset($_GET['act']) && $_GET['act'] == 'dirs' && ($group_access['dirs'] || $
 			$content.='<td class="span1">№</td>';
 			$content.='<td class="span4">Название</td>';
 			$content.='<td class="span5">Область</td>';
+			$content.='<td class="span2">Широта</td>';
+			$content.='<td class="span2">Долгота</td>';
 			$content.='<td class="span8">Описание</td>';
 			$content.='<td class="span2">&nbsp;</td>';
 			$content.='</tr>';
@@ -980,6 +984,8 @@ if (isset($_GET['act']) && $_GET['act'] == 'dirs' && ($group_access['dirs'] || $
 				$content.='<td>'.$i.'</td>';
 				$content.='<td>'.$row['name'].'&nbsp;</td>';
 				$content.='<td>'.$row['region_name'].'&nbsp;</td>';
+				$content.='<td>'.$row['lat'].'&nbsp;</td>';
+				$content.='<td>'.$row['lon'].'&nbsp;</td>';
 				$content.='<td>'.$row['descrip'].'&nbsp;</td>';
 				$content.='
 				<td class="toolbar m0">
