@@ -29,7 +29,7 @@ function show_menu() {
     <div class="horizontal-menu bg-color-blueLight">
         <ul>
             <li><a class="icon-home" href="/fibers"></a></li>
-            <li><a href="?act=s_node">Узлы</a></li>
+            <li><a href="?act=s_node&city_id='.(isset($_GET['city_id'])?$_GET['city_id']:'1').'">Узлы</a></li>
     		
     		'.($group_access['key']?'<li><a href="?act=dirs&dir=keys">Ключи</a></li>':'').
             ($group_access['dirs']?'<li class="sub-menu"><a href="#">Справочники</a>
@@ -166,33 +166,54 @@ if (isset($_GET['act']) && $_GET['act'] == 'login') {
 
 // вывод списка узлов
 if (isset($_GET['act']) && $_GET['act'] == 's_node' && $group_access['node']) {
-    $sql = "SELECT DISTINCT(LEFT(name, 1)) AS name FROM " . $table_street_name." ORDER BY name";
+	if(!isset($_GET['city_id'])) $_GET['city_id'] = 1;
+	$latlon=pg_fetch_assoc(pg_query("SELECT ST_X(ST_astext(the_geom)) AS lat, ST_Y(ST_astext(the_geom)) AS lon FROM ".$table_city." WHERE id = ".clean($_GET['city_id'])));
+    $sql = "SELECT DISTINCT(LEFT(sn.name, 1)) AS name FROM ".$table_street_name." AS sn, ".$table_area." AS a WHERE sn.area_id = a.id AND a.city_id = ".$_GET['city_id']." ORDER BY name";
     $result = pg_query($sql);
     $find_abc='';
     if (pg_num_rows($result)) {
         while ($row = pg_fetch_assoc($result)) {
         	$find_node_get=(@isset($_GET['find_node'])?$_GET['find_node']:"");
-            $find_abc .= '<div class="b_m">'.($row['name'].'*'==$find_node_get?'<div class="b_m">'.$row['name'].'</div>':'<a class="b_m_a" href="?act=s_node&find_node='.$row['name'].'*'.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'">'.$row['name'].'</a>').'</div>';
+            $find_abc .= '<div class="b_m">'.($row['name'].'*'==$find_node_get?'<div class="b_m">'.$row['name'].'</div>':'<a class="b_m_a" href="?act=s_node&find_node='.$row['name'].'*'.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').(isset($_GET['city_id'])?'&city_id='.clean($_GET['city_id']):'').'">'.$row['name'].'</a>').'</div>';
         	//$find_abc .= '<div class="b_m"><a class="b_m_a" href="?act=s_node&find_node='.$row['name'].'%'.(is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').'">'.$row['name'].'</a></div>';
         }
-        $find_abc .= '<div class="b_m"><a class="b_m_a" href="?act=s_node'.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'">Все</a></div>';
+        $find_abc .= '<div class="b_m"><a class="b_m_a" href="?act=s_node'.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').(isset($_GET['city_id'])?'&city_id='.clean($_GET['city_id']):'').'">Все</a></div>';
     }
     $i = 1;
     //$link = '<div class="title">Узлы</div>';
     $title='Узлы';
     $action='';
     if ($group_access['node_add'])
-    	$action.='<div class="span2 m0 text-left"><button class="m0" id="in_div" rel="?act=n_node" />Добавить узел</button></div>';
+    	$action.='<div class="span2 m0 text-left"><button class="m0" id="in_div" rel="?act=n_node&city_id='.$_GET['city_id'].'" />Добавить узел</button></div>';
         //$action.='<div class="span2 m0 text-left"><button class="m0" id="node_add_div" rel="?act=n_node" />Добавить узел</button></div>';
     $action.='<div class="span3 m0 text-left input-control text"><input class="" id="find_node" type="text" onchange="javascript: window.location=\'?act=s_node&find_node=*\'+$(\'input#find_node\').val()+\'*'.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'\';" placeholder="Введите для поиска" /></div>';
     $action.='<div class="span1 m0 text-left toolbar"><button class="icon-search m0" onClick="javascript: window.location=\'?act=s_node&find_node=*\'+$(\'input#find_node\').val()+\'*'.(@is_numeric($_GET['area_id'])?'&area_id='.$_GET['area_id']:'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'\';" /></button></div>';
-    
-    $sql="SELECT * FROM ".$table_area." ORDER BY id,name";
+
+    //районы
+    $sql="SELECT * FROM ".$table_city." ORDER BY id,name";
     $result = pg_query($sql);
+    $select_city='<select id="select_city" onChange="var city_id=\'\'; if($(\'select#select_city\').val()) city_id=\'&city_id=\'+$(\'select#select_city\').val(); window.location=\'?act=s_node'.(isset($_GET['find_node'])?'&find_node='.clean($_GET['find_node']):'').(@is_numeric($_GET['page'])?'&page='.clean($_GET['page']):'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'\'+city_id;">';
+    //$select_city.='<option value="">Все города</option>';
     if(pg_num_rows($result)){
-    	//$select_area='<select id="select_area" onchange="if($(\'select#select_area\').val()) var area_id=\'&area_id=\'+$(\'select#select_area\').val(); window.location=\'?act=s_node'.(isset($_GET['find_node'])?'&find_node='.clean(($_GET['find_node'])):'').(isnumeric($_GET['page'])?'&page='.clean(($_GET['page'])):'').'+area_id;">';
-    	$select_area='<select id="select_area" onChange="var area_id=\'\'; if($(\'select#select_area\').val()) area_id=\'&area_id=\'+$(\'select#select_area\').val(); window.location=\'?act=s_node'.(isset($_GET['find_node'])?'&find_node='.clean($_GET['find_node']):'').(@is_numeric($_GET['page'])?'&page='.clean($_GET['page']):'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').'\'+area_id;">';
-    	$select_area.='<option value="">Все районы</option>';
+    	while($row=pg_fetch_assoc($result)){
+    		$select_city.='<option value="'.$row['id'].'"';
+    		if(@$_GET['city_id']==$row['id']) {
+    			$select_city.=" SELECTED";
+    		}
+    		$select_city.='>'.$row['name'].'</option>';
+    	}
+    }
+    $select_city.='</select>';
+    $action.='<div class="span2 m0 input-control text">'.$select_city.'</div>';
+
+    //районы
+    $sql="SELECT * FROM ".$table_area." WHERE city_id = ".$_GET['city_id']." ORDER BY id,name";
+    $result = pg_query($sql);
+    //$select_area='<select id="select_area" onchange="if($(\'select#select_area\').val()) var area_id=\'&area_id=\'+$(\'select#select_area\').val(); window.location=\'?act=s_node'.(isset($_GET['find_node'])?'&find_node='.clean(($_GET['find_node'])):'').(isnumeric($_GET['page'])?'&page='.clean(($_GET['page'])):'').'+area_id;">';
+    $select_area='<select id="select_area" onChange="var area_id=\'\'; if($(\'select#select_area\').val()) area_id=\'&area_id=\'+$(\'select#select_area\').val(); window.location=\'?act=s_node'.(isset($_GET['find_node'])?'&find_node='.clean($_GET['find_node']):'').(@is_numeric($_GET['page'])?'&page='.clean($_GET['page']):'').(isset($_GET['node_type_id'])?'&node_type_id='.clean($_GET['node_type_id']):'').(isset($_GET['city_id'])?'&city_id='.clean($_GET['city_id']):'').'\'+area_id;">';
+    $select_area.='<option value="">Все районы</option>';
+    if(pg_num_rows($result)){
+    	
     	while($row=pg_fetch_assoc($result)){
     		$select_area.='<option value="'.$row['id'].'"';
     		if(@$_GET['area_id']==$row['id']) {
@@ -200,15 +221,15 @@ if (isset($_GET['act']) && $_GET['act'] == 's_node' && $group_access['node']) {
     		}
     		$select_area.='>'.$row['name'].'</option>';
     	}
-    	$select_area.='</select>';
     }
-    $action.='<div class="span3 m0 input-control text">'.$select_area.'</div>';
+    $select_area.='</select>';
+    $action.='<div class="span2 m0 input-control text">'.$select_area.'</div>';
     
     // фильтр по типам узлов
     $sql="SELECT * FROM ".$table_node_type." ORDER BY id,name";
     $result = pg_query($sql);
     if(pg_num_rows($result)){
-    	$select_node_type='<select id="select_node_type" onChange="var node_type_id=\'\'; if($(\'select#select_node_type\').val()) node_type_id=\'&node_type_id=\'+$(\'select#select_node_type\').val(); window.location=\'?act=s_node'.(isset($_GET['find_node'])?'&find_node='.clean($_GET['find_node']):'').(@is_numeric($_GET['page'])?'&page='.clean($_GET['page']):'').(isset($_GET['area_id'])?'&area_id='.clean($_GET['area_id']):'').'\'+node_type_id;">';
+    	$select_node_type='<select id="select_node_type" onChange="var node_type_id=\'\'; if($(\'select#select_node_type\').val()) node_type_id=\'&node_type_id=\'+$(\'select#select_node_type\').val(); window.location=\'?act=s_node'.(isset($_GET['find_node'])?'&find_node='.clean($_GET['find_node']):'').(@is_numeric($_GET['page'])?'&page='.clean($_GET['page']):'').(isset($_GET['area_id'])?'&area_id='.clean($_GET['area_id']):'').(isset($_GET['city_id'])?'&city_id='.clean($_GET['city_id']):'').'\'+node_type_id;">';
     	$select_node_type.='<option value="">Все типы узлов</option>';
     	while($row=pg_fetch_assoc($result)){
     		$select_node_type.='<option value="'.$row['id'].'"';
@@ -220,6 +241,8 @@ if (isset($_GET['act']) && $_GET['act'] == 's_node' && $group_access['node']) {
     	$select_node_type.='</select>';
     }
     $action.='<div class="span2 m0 input-control text">'.$select_node_type.'</div>';
+    
+    $action.='<a class="button" href="/fibers/geomap.php?lat='.$latlon['lat'].'&lon='.$latlon['lon'].'" target="_blank">Карта сети</a>';
 
     $find_node='';
     if (isset($_GET['find_node'])) {

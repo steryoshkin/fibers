@@ -2,7 +2,7 @@
 	@header('Content-Type: text/html; charset=utf-8');
 	include_once ('class/xml2array.php');
 	
-	$host='62.231.168.109';
+	$host='172.17.2.249';
 	$addr_obl='Кемеровская область';
 
 	session_start();
@@ -912,6 +912,29 @@
     	//echo '<pre>'.$text.'</pre>';
     }
 ///////////////////////////////////////////////////////////////
+// вывод списка улиц в городе
+function street_list_select($city_id, $street_id) {
+	global $table_street_name;
+	global $table_area;
+
+    $sql="SELECT s1.*, a1.name AS area FROM ".$table_street_name." AS s1, ".$table_area." AS a1 WHERE s1.area_id = a1.id AND a1.id = ".$city_id." ORDER BY s1.name";
+    $result = pg_query($sql);
+    $text='<select id="street_name">';
+    $text.='<option value="0">-Улица-</option>';
+    if(pg_num_rows($result)){
+    
+    	while($row=pg_fetch_assoc($result)){
+    		$text.='<option value="'.$row['id'].'"';
+    		if(@$street_id==$row['id']) {
+    			$text.=" SELECTED";
+    		}
+    		$text.='>'.$row['name'].' ('.$row['area'].')</option>';
+    	}
+    }
+    $text.='</select>';
+    return $text;
+}
+    
 // вывод номера порта в кроссе присоедененного к волокну
 function get_port_select($fiber_id,$pq_id,$enable=false) {
 	global $table_cruz_conn;

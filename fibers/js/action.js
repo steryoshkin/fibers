@@ -314,7 +314,15 @@ $(document).ready(
                       alert('Введите область');
                       $('input#area').focus();
                       return false;
-                  } else
+                  } else if(!$.isNumeric($('input#lat').val())) {
+                      alert('Введите широту');
+                      $('input#lat').focus();
+                      return false;
+                  } else if(!$.isNumeric($('input#lon').val())) {
+	                  alert('Введите долготу');
+	                  $('input#lon').focus();
+	                  return false;
+	              }
                   var id = $("input#id").val(); 
                   if(!id) id=0;
                   $.post("./engine/backend.php", {
@@ -322,6 +330,8 @@ $(document).ready(
                       id: id,
                       name: $('input#name').val(),
                       region_id: $('select#region').val(),
+                      lat: $('input#lat').val(),
+                      lon: $('input#lon').val(),
                       descrip: $('input#descrip').val()
                   }, function (reply) {
                       if(reply)
@@ -680,13 +690,13 @@ $(document).ready(
                  alert('Введите номер дома');
                  $('input#street_num').focus();
                  return false;
-             }/* else
+             } else
              if($('select#node_type').val() == 0) {
                  alert('Выберите тип узла');
                  $('select#node_type').focus();
                  return false;
-             }*/
-             var id = $("select#id").val(); 
+             } 
+             var id = $("input#id").val();
              if(!id) id=0;
              $.post("./engine/backend.php", {
                  act: 'check_street_num',
@@ -720,6 +730,24 @@ $(document).ready(
                  });
              return false;
              });
+         });
+         
+// вывод списка улиц при выборе города 
+         $("select#[id='city']").live('change', function(event) {
+             var city_id = $("select#[id='city']").val();
+             //alert(city_id);
+             ////alert("fiber_id "+fiber_id+" pq_id "+pq_id);
+             //pq_type = $("input#pq_type").val();
+             //pq_num = $("input#pq_num").val();
+             //alert('pq_id: ' + pq_id + ' node_id:' + node_id + " " + fiber_id);
+             //cable_list($("select#pq_from_" + s).val(),s,0);
+             //pq_list(node_id,pq_id,pq_type,pq_num,fiber_id);
+             //pq_list(node_id,pq_id,pq_type,pq_num,fiber_id);
+             //cable_list(pq_id,cable_id,fiber_id)
+             //cable_list(pq_id,0,fiber_id,true);
+             street_list(city_id);
+             //$("select#fiber_id_"+fiber_id).html("");
+             //$("select#fiber_id_"+fiber_id).attr("disabled",true);
          });
 // узел end -------------------------------------------------------------------------------------------------------
 
@@ -2166,6 +2194,20 @@ function beforeSubmit(){
 	}
 };
 // функции
+
+//функция вывода улиц в городе
+//function street_list(city_id, street_id) {
+function street_list(city_id) {
+	//if(!street_id) street_id=0;
+	$.post("./engine/backend.php", {
+        act: 'street_list',
+        city_id: city_id//,
+//        street_id: street_id
+    }, function (reply) {
+    	$("select#street_name").html(reply);
+    });
+	return false;
+}
 
 //функция вывода кабелей в кроссе/муфте
 function cable_list(pq_id,cable_id,fiber_id,enable) {

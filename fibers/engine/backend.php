@@ -397,7 +397,7 @@
     	if($_GET['act']=='e_city')
     	{
     		$id=clean($_GET['id']);
-    		$sql="SELECT * FROM ".$table_city." WHERE id = ".$id;
+    		$sql="SELECT *, ST_X(ST_astext(the_geom)) AS lat, ST_Y(ST_astext(the_geom)) AS lon FROM ".$table_city." WHERE id = ".$id;
     		$result=pg_fetch_assoc(pg_query($sql));
     		$name=$result['name'];
     		$region_id=$result['region_id'];
@@ -434,21 +434,22 @@
 
 // ввод новой/редактирование города/посёлка в div post
     if(isset($_POST['act']) && @is_numeric($_POST['id']) && isset($_POST['name']) && ($_POST['act']=='n_city' || $_POST['act']=='e_city') && @is_numeric($_POST['region_id']) ) {
-        $sql="SELECT COUNT(*) FROM ".$table_city." WHERE name='".clean($_POST['name'])."' AND region_id=".clean($_POST['region_id']);
+        $sql="SELECT COUNT(*) FROM ".$table_city." WHERE name='".clean($_POST['name'])."' AND region_id=".clean($_POST['region_id'])." AND the_geom=ST_GeomFromText('POINT(".clean($_POST['lat'])." ".clean($_POST['lon']).")', 4326)";
+    	//$sql="SELECT COUNT(*) FROM ".$table_city." WHERE name='".clean($_POST['name'])."' AND region_id=".clean($_POST['region_id']);
     	if($_POST['act']=='n_city') {
     		if(@pg_result(pg_query($sql),0)) {
     			$text="Создать невозможно, такаой город/посёлок существует!!!";
     		} else {
-    			pg_query("INSERT INTO ".$table_city." (name,region_id,descrip,user_id) VALUES ('".clean($_POST['name'])."', ".clean($_POST['region_id']).", ".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", ".$user_id.")");
+    			pg_query("INSERT INTO ".$table_city." (name,region_id,descrip,user_id,the_geom) VALUES ('".clean($_POST['name'])."', ".clean($_POST['region_id']).", ".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", ".$user_id.", ST_GeomFromText('POINT(".clean($_POST['lat'])." ".clean($_POST['lon']).")', 4326))");
     		}
     	} elseif($_POST['act']=='e_city') {
-    		if(@pg_result(pg_query($sql." AND region_id ".($_POST['region_id']?"=".$_POST['region_id']:"IS NULL")." AND descrip ".($_POST['descrip']?"='".$_POST['descrip']."'":"IS NULL")),0)) {
+    		//if(pg_result(pg_query($sql." AND region_id ".($_POST['region_id']?"=".$_POST['region_id']:"IS NULL")." AND descrip ".($_POST['descrip']?"='".$_POST['descrip']."'":"IS NULL")),0)) {
+    		if(@pg_result(pg_query($sql." AND descrip ".($_POST['descrip']?"='".$_POST['descrip']."'":"IS NULL")),0)) {
     			$text="Изменить невозможно, такай город/посёлок существует!!!";
-    			////
     		} else {
     			$data_old=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_city." WHERE id = ".clean($_POST['id']) ));
 
-    			pg_query("UPDATE ".$table_city." SET name='".clean($_POST['name'])."', region_id=".clean($_POST['region_id']).", descrip=".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", user_id=".$user_id." WHERE id=".clean($_POST['id']).";")
+    			pg_query("UPDATE ".$table_city." SET name='".clean($_POST['name'])."', region_id=".clean($_POST['region_id']).", descrip=".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", user_id=".$user_id.", the_geom=ST_GeomFromText('POINT(".clean($_POST['lat'])." ".clean($_POST['lon']).")', 4326) WHERE id=".clean($_POST['id']).";")
                     or die("Изменить невозможно, такай город/посёлок существует!!!");
 
 				$data_new=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_city." WHERE id = ".clean($_POST['id']) ));
@@ -526,7 +527,7 @@
 
 // ввод новой/редактирование района в div post
     if(isset($_POST['act']) && @is_numeric($_POST['id']) && isset($_POST['name']) && ($_POST['act']=='n_area' || $_POST['act']=='e_area') && @is_numeric($_POST['city_id']) ) {
-        $sql="SELECT COUNT(*) FROM ".$table_area." WHERE name='".clean($_POST['name'])."' AND city_id=".clean($_POST['region_id']);
+        $sql="SELECT COUNT(*) FROM ".$table_area." WHERE name='".clean($_POST['name'])."' AND city_id=".clean($_POST['city_id']);
     	if($_POST['act']=='n_area') {
     		if(@pg_result(pg_query($sql),0)) {
     			$text="Создать невозможно, такаой район существует!!!";
@@ -534,7 +535,8 @@
     			pg_query("INSERT INTO ".$table_area." (name,city_id,descrip,user_id) VALUES ('".clean($_POST['name'])."', ".clean($_POST['city_id']).", ".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", ".$user_id.")");
     		}
     	} elseif($_POST['act']=='e_area') {
-    		if(@pg_result(pg_query($sql." AND city_id ".($_POST['city_id']?"=".$_POST['city_id']:"IS NULL")." AND descrip ".($_POST['descrip']?"='".$_POST['descrip']."'":"IS NULL")),0)) {
+    		if(@pg_result(pg_query($sql." AND descrip ".($_POST['descrip']?"='".$_POST['descrip']."'":"IS NULL")),0)) {
+    		//if(@pg_result(pg_query($sql." AND city_id ".($_POST['city_id']?"=".$_POST['city_id']:"IS NULL")." AND descrip ".($_POST['descrip']?"='".$_POST['descrip']."'":"IS NULL")),0)) {
     			$text="Изменить невозможно, такай район существует!!!";
     			////
     		} else {
@@ -604,7 +606,7 @@
     				$select_area.=" SELECTED";
     				$region_id=$row['region_id'];
     			}
-    			$select_area.='>'.$row['name'].'('.$row['city_name'].')</option>';
+    			$select_area.='>'.$row['name'].' ('.$row['city_name'].')</option>';
     		}
     		$select_area.='</select>';
     	}
@@ -621,7 +623,7 @@
 
 // ввод новой/редактирование улицы в div post
     if(isset($_POST['act']) && @is_numeric($_POST['id']) && isset($_POST['name']) && ($_POST['act']=='n_street_name' || $_POST['act']=='e_street_name') && @is_numeric($_POST['area_id']) ) {
-        $sql="SELECT COUNT(*) FROM ".$table_street_name." WHERE name='".clean($_POST['name'])."' AND small_name=".($_POST['small_name']?"'".clean($_POST['small_name'])."'":'NULL')." AND area_id=".clean($_POST['area_id']);
+        $sql="SELECT COUNT(*) FROM ".$table_street_name." WHERE name='".clean($_POST['name'])."' AND small_name ".($_POST['small_name']?"='".clean($_POST['small_name'])."'":'IS NULL')." AND area_id=".clean($_POST['area_id']);
     	if($_POST['act']=='n_street_name') {
     		if(@pg_result(pg_query($sql),0)) {
     			$text="Создать невозможно, такая улица существует!!!";
@@ -629,7 +631,8 @@
     			pg_query("INSERT INTO ".$table_street_name." (name,small_name,area_id,descrip,user_id) VALUES ('".clean($_POST['name'])."', ".($_POST['small_name']?"'".clean($_POST['small_name'])."'":"NULL").", ".clean($_POST['area_id']).", ".($_POST['descrip']?"'".$_POST['descrip']."'":"NULL").", ".$user_id.")");
     		}
     	} elseif($_POST['act']=='e_street_name') {
-    		if(@pg_result(pg_query($sql." AND street_id ".($_POST['street_id']?"=".$_POST['street_id']:"IS NULL")." AND descrip ".($_POST['descrip']?"='".$_POST['descrip']."'":"IS NULL")),0)) {
+    		if(@pg_result(pg_query($sql." AND descrip ".($_POST['descrip']?"='".$_POST['descrip']."'":"IS NULL")),0)) {
+    		//if(@pg_result(pg_query($sql." AND street_id ".($_POST['street_id']?"=".$_POST['street_id']:"IS NULL")." AND descrip ".($_POST['descrip']?"='".$_POST['descrip']."'":"IS NULL")),0)) {
     			$text="Изменить невозможно, такая улица существует!!!";
     			////
     		} else {
@@ -1405,13 +1408,15 @@ function set_color($table,$id,$type,$color_id) {
     	{
     		$node_id=clean($_GET['node_id']);
     		$sql="SELECT * FROM ".$table_node." WHERE id='".$node_id."';";
-    		$sql="SELECT n.*
-    				FROM ".$table_node." AS n
+    		$sql="SELECT n.*, a.city_id AS city_id
+    				FROM ".$table_area." AS a,
+    				".$table_node." AS n
     				LEFT JOIN ".$table_street_name." AS s ON s.id = n.street_id  
     				LEFT JOIN ".$table_street_num." AS sn ON sn.id = n.street_num_id
-    				WHERE n.id='".$node_id."';";
+    				WHERE s.area_id = a.id AND n.id='".$node_id."';";
     		//$address=@pg_result(pg_query("SELECT address FROM ".$table_node." WHERE id='".$node_id."';"),0);
     		$result=pg_fetch_assoc(pg_query($sql));
+    		$city_id=$result['city_id'];
     		$street_id=$result['street_id'];
     		$street_num_id=$result['street_num_id'];
     		$num_ent=$result['num_ent'];
@@ -1420,11 +1425,11 @@ function set_color($table,$id,$type,$color_id) {
     		$descrip=$result['descrip'];
     		$incorrect=$result['incorrect'];
     		$node_type_id=$result['node_type_id'];
-
     		$select_node='<select id="id">';
 			$select_node.='<option value="'.clean($_GET['node_id']).'" SELECTED">'.$node_id.'</option>';
     		$select_node.='</select>';
     	} else if($_GET['act']=='n_node') {
+    		$city_id=clean($_GET['city_id']);
     		pg_query("UPDATE ".$table_node." SET is_new = 'f'::boolean WHERE address IS NOT NULL");
     		// забить в полный адрес с геокодирования
     		$sql="SELECT id, ST_X(ST_astext(the_geom)) AS lon, ST_Y(ST_astext(the_geom)) AS lat FROM ".$table_node." WHERE is_new = true AND address_full IS NULL";
@@ -1451,12 +1456,29 @@ function set_color($table,$id,$type,$color_id) {
     			$select_node.='</select>';
     		}
     	}
-    	// улица
-    	$sql="SELECT s1.*, a1.name AS area FROM ".$table_street_name." AS s1, ".$table_area." AS a1 WHERE s1.area_id = a1.id ORDER BY s1.name";
+    	// Город
+    	$sql="SELECT c1.id, r1.name AS region, c1.name AS city FROM ".$table_city." AS c1, ".$table_region." AS r1 WHERE c1.region_id = r1.id ORDER BY r1.name, c1.name";
     	$result = pg_query($sql);
+    	$select_city='<select id="city">';
+    	//$select_city.='<option value="0">-Город-</option>';
     	if(pg_num_rows($result)){
-    		$select_street_name='<select id="street_name">';
-    		$select_street_name.='<option value="0">-Улица-</option>';
+    		
+    		while($row=pg_fetch_assoc($result)){
+    			$select_city.='<option value="'.$row['id'].'"';
+    			if(@$city_id==$row['id']) {
+    				$select_city.=" SELECTED";
+    			}
+    			$select_city.='>'.$row['city'].' ('.$row['region'].')</option>';
+    		}
+    	}
+    	$select_city.='</select>';
+    	// улица
+/*    	$sql="SELECT s1.*, a1.name AS area FROM ".$table_street_name." AS s1, ".$table_area." AS a1 WHERE s1.area_id = a1.id AND a1.id = ".$city_id." ORDER BY s1.name";
+    	$result = pg_query($sql);
+    	$select_street_name='<select id="street_name">';
+    	$select_street_name.='<option value="0">-Улица-</option>';
+    	if(pg_num_rows($result)){
+    		
     		while($row=pg_fetch_assoc($result)){
     			$select_street_name.='<option value="'.$row['id'].'"';
     			if(@$street_id==$row['id']) {
@@ -1464,8 +1486,10 @@ function set_color($table,$id,$type,$color_id) {
     			}
     			$select_street_name.='>'.$row['name'].' ('.$row['area'].')</option>';
     		}
-    		$select_street_name.='</select>';
     	}
+    	$select_street_name.='</select>';
+*/
+    	$select_street_name=street_list_select($city_id, $street_id);
     	// номер дома
     	if(@$street_num_id) {
     		$sql="SELECT num FROM ".$table_street_num." WHERE id=".$street_num_id." AND street_name_id=".$street_id;
@@ -1518,10 +1542,11 @@ function set_color($table,$id,$type,$color_id) {
     	}
 
     	$text='<input type="hidden" id="act" value="'.clean($_GET['act']).'" />';
-
-    	//$text.='<input type="hidden" id="id" value="'.$node_id.'" />';
+    	$text.='<input type="hidden" id="id" value="'.$node_id.'" />';
     	if(!empty($select_node)) {
-	    	$text.='<div class="span3 m0 input-control text" '.($_GET['act']=='e_node'?'style="display: none;"':'').'>'.$select_node.'</div>';
+	    	//$text.='<div class="span3 m0 input-control text" '.($_GET['act']=='e_node'?'style="display: none;"':'').'>'.$select_node.'</div>';
+    		$text.='<div class="span3 m0 input-control text" >'.($_GET['act']=='e_node'?'&nbsp;':$select_node).'</div>';
+	    	$text.='<div class="span3 m0 input-control text">'.$select_city.'</div>';
 	    	$text.='<div class="span3 m0 input-control text">'.$select_street_name.'</div>';
 	    	$text.='<div class="span1 span1_5 m0 input-control text"><input class="mini" type="text" id="street_num" value="'.@$street_num.'" placeholder="№ дома" /></div>';
 	    	$text.='<div class="span1 span1_5 m0 input-control text"><input class="mini" type="text" id="num_ent" value="'.@$num_ent.'" placeholder="№ подъезда" /></div>';
@@ -1576,7 +1601,7 @@ function set_color($table,$id,$type,$color_id) {
 					".($_POST['act']=='n_node'?'type = 0,':'')."
 					is_new = 'f'::boolean
                     WHERE id = ".$id.";";
-                //echo $sql_u;
+                echo $sql_u;
                 $data_old=pg_fetch_assoc(pg_query("SELECT * FROM ".$table_node." WHERE id = ".$id ));
 
                 pg_query($sql_u);
@@ -1641,6 +1666,12 @@ function set_color($table,$id,$type,$color_id) {
         die;
     }
 // узел end -------------------------------------------------------------------------------------------------------
+
+// вывод списка улиц в городе в div
+    if(isset($_POST['act']) && $_POST['act']=='street_list' && @is_numeric($_POST['city_id'])) {
+    	echo $select_street_name=street_list_select(clean($_POST['city_id']), 0);
+    	die;
+    }
 
 // типы коммутаторов begin -------------------------------------------------------------------------------------------------------
 // ввод нового/редактирование типа коммутатора в div
