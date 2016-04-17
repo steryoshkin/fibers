@@ -298,6 +298,7 @@ if (isset($_GET['act']) && $_GET['act'] == 's_node' && $group_access['node']) {
 			ST_X(ST_AsText(n1.the_geom)) AS x,
 			ST_Y(ST_AsText(n1.the_geom)) AS y
 		FROM
+			".$table_area." AS a1,
 			".$table_street_name." AS s_name,
 			".$table_street_num." AS s_num,
 			".$table_node." AS n1
@@ -308,6 +309,10 @@ if (isset($_GET['act']) && $_GET['act'] == 's_node' && $group_access['node']) {
 		LEFT JOIN ".$table_box." AS box ON box.node_id = n1.id
 		LEFT JOIN ".$table_switches." AS sw ON sw.node_id = n1.id
 		WHERE
+			s_name.area_id = a1.id
+		AND
+			a1.city_id = ".$_GET['city_id']."
+		AND
 			n1.street_id = s_name.id
 		AND
 			n1.street_num_id = s_num.id
