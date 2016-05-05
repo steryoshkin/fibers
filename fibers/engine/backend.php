@@ -4096,7 +4096,7 @@ function fib_find($id,$last_id,$to_node_id,$geom=false) {
 	CASE WHEN p3.node = n2.id THEN p3.id ELSE p4.id END AS to_pq_id,
 	c2.id AS to_cable_id,
 		
-	c_n.id AS curr_node_id, c_n.address AS curr_node_addr, c_n.descrip AS curr_node_descrip,
+	c_n.id AS curr_node_id, c_n.address_full AS curr_node_addr, c_n.descrip AS curr_node_descrip,
 	c_n.incorrect,
 	CASE WHEN p1.node = c_n.id THEN p1.id ELSE CASE WHEN p2.node = c_n.id THEN p2.id ELSE NULL END END AS curr_pq_id,
 
@@ -4246,7 +4246,7 @@ function fib_find($id,$last_id,$to_node_id,$geom=false) {
 	} else {
         $sql2='
         SELECT
-        	f1.id AS id, f1.num AS num, n1.id AS curr_node_id, n1.address AS curr_node_addr, n1.incorrect, n1.descrip AS curr_node_descrip, p1.id AS curr_pq_id,
+        	f1.id AS id, f1.num AS num, n1.id AS curr_node_id, n1.address_full AS curr_node_addr, n1.incorrect, n1.descrip AS curr_node_descrip, p1.id AS curr_pq_id,
         	f1.mod_color AS mod_color, f1.fib_color AS fib_color,
         	ST_AsGeoJSON(c1.the_geom) AS the_geom
         FROM '.$table_fiber.' AS f1, '.$table_cable.' AS c1, '.$table_pq.' AS p1, '.$table_node.' AS n1
