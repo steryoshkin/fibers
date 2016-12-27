@@ -1356,6 +1356,10 @@ $(document).ready(
             	alert('Введите тип кросса/муфты');
             	return false;
             }
+            if($('#num').val()<1) {
+            	alert('Введите номер кросса/муфты');
+            	return false;
+            }
             //var ports = $("input#pq_ports").val();
             var pq_descrip = $("input#pq_descrip").val();
             //var pq_type = $("select#pq_type").val();
