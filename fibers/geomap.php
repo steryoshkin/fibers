@@ -232,7 +232,7 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
 
                 tb.addControls([
                     new OpenLayers.Control.Navigation({
-						title: 'Навигация',
+						title: 'Навигация (CTRL + M)',
 						'activate': function ()
                         	{
 								find = '';
@@ -272,7 +272,7 @@ if (empty($_SESSION['logged_user_fibers']) && $_SERVER['REQUEST_URI'] != $login_
                         geodesic: true
                     }),
                     new OpenLayers.Control.Button({
-						title: 'Поиск',
+						title: 'Поиск (CTRL + F)',
                         displayClass: "find",
 	                    trigger: function () {
 							deactivateToggleControls();
