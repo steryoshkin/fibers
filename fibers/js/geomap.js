@@ -8,7 +8,42 @@ $(document).ready(function() {
 		}
 		return false;
     });
-	
+// обработка нажатия кнопок 
+	var ctrl_down = false;
+	var ctrl_key = 17;
+	var m_key = 77;
+	var f_key = 70;
+
+	$(document).keydown(function(e) {
+	    if (e.keyCode == ctrl_key) ctrl_down = true;
+	}).keyup(function(e) {
+	    if (e.keyCode == ctrl_key) ctrl_down = false;
+	});
+
+	$(document).keydown(function(e) {
+	    if (ctrl_down && (e.keyCode == m_key)) {
+	    	deactivateToggleControls();
+	    	$("input#sloc").val();
+			$("div.panel-sloc").hide();
+			popupClear();
+			tb.controls[0].activate();
+	        return false;
+	    }
+	});
+
+	$(document).keydown(function(e) {
+	    if (ctrl_down && (e.keyCode == f_key)) {
+	        deactivateToggleControls();
+			$(".alertify-logs").html("");
+			popupClear();
+			tb.controls[2].activate();
+			$("div.panel-sloc").show();
+			$('input#sloc').focus();
+	        return false;
+	    }
+	});
+// конец обработка нажатия кнопок
+
 	$("input#sloc").keydown(function(e) {
        //console.log('keyup called');
        var code = e.keyCode || e.which;
