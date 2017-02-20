@@ -472,10 +472,10 @@ if (isset($_GET['act']) && $_GET['act'] == 's_pq' && ( is_numeric($_GET['node_id
 	            	<td class="span4"><a href="?act=s_cable&pq_id='.$row['id'].'">'.$type.$num.' ('.$row['name'].')</a></td>
 	            	<td class="span8">'.$row['pq_descrip'].'</td>
 	            ';
-	            if ($group_access['o_node_edit'] || $group_access['o_node_del'])
-	                $content.='<td class="span2">';
-	            else
-	                $content.='<td class="span2">&nbsp;</td>';
+/*	            if ($group_access['o_node_edit'] || $group_access['o_node_del'])
+	                $content.='<td class="span2">&nbsp;';
+	            else*/
+	                $content.='<td class="span2">&nbsp;';
 	            if ($group_access['o_node_edit'])
 	                $content.='<button class="icon-pencil mini m0" id="pq_e_add_div" rel="?act=e_pq&pq_id='.$row['id'].'" title="Редактировать" /></button>&nbsp;';            
 	            if ($group_access['o_node_del'])
