@@ -696,7 +696,7 @@ $(document).ready(
                  $('select#node_type').focus();
                  return false;
              } 
-             var id = $("input#id").val();
+             var id = $("select#id").val();
              if(!id) id=0;
              $.post("./engine/backend.php", {
                  act: 'check_street_num',
