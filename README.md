@@ -160,6 +160,8 @@ Ubuntu Server
 
 перед работой необходимо заполнить справочники адресов
 
+Видео по проекту https://youtu.be/-9gCLdVFJBY
+
 skype: sergey_teryoshkin
 
 Поддержка проекта: https://money.yandex.ru/to/410011465260309
